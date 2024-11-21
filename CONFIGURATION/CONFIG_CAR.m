@@ -44,8 +44,6 @@ MPU60X0 = CONFIG_MPU60X0();
 VL6180X = CONFIG_VL6180X();
 % ************** RCRX iBUS CONFIGURATION ****************
 RCRX = CONFIG_RCRX();
-% *********  WIRELESS CHARGING: CURRENT SENSOR ***********
-MCP3201 = CONFIG_MCP3201();
 % *******************************************************
 cd ../CONFIGURATION
 %--------------------------------------------------------------
