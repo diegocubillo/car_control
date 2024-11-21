@@ -393,6 +393,12 @@ switch RUN_MODE
         set_param([MODEL_SLX '/GAZEBO SIMULATION'],'Commented','off');
         set_param([MODEL_SLX '/SIMULATION'],'Commented','on');
         set_param(MODEL_SLX,'SimulationMode','External');
+        set_param(MODEL_SLX,'HardwareBoard','Robot Operating System 2 (ROS 2)');
+        set_param(MODEL_SLX,'TargetHWDeviceType','ARM Compatible->ARM 8');
+        set_param(MODEL_SLX,'SupportVariableSizeSignals','on');
+        set_param(MODEL_SLX,'CodeInterfacePackaging','Nonreusable function');
+        set_param(MODEL_SLX,'MATLABDynamicMemAlloc','on');
+
         CONTROL_INI.STATE.CURRENT_STATUS_SYS = uint8(0);
         CONTROL_INI.STATE.CURRENT_STATUS_PC = uint8(0);
         CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 0.5;

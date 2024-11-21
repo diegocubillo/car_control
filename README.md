@@ -22,3 +22,13 @@ Para añadir mensajes ROS2 personalizados presentes en el submódulo tcp_ros_pac
     ```
 
 Recuerda reemplazar `~/` con la ruta real al directorio donde tengas descargado car_control.
+
+## Compilación de nodo ROS2 en Raspberry Pi 4
+1. **Abrir el modelo de simulink con su configuración:**
+  - Ejecutar config_car.m con RUN_MODE=5. El modelo de simulink se abrirá ya configurado para cargar el nodo ROS2.
+
+2. **Configurar los datos de la Raspberry Pi 4:**
+  - Introducir en ROS -> CONNECT -> Deploy to -> Manage Remote Device la IP, usuario, contraseña y directorios solicitados para el envío al hardware remoto del nodo. Mediante el botón Test Connection se puede verificar que haya conexión, todos los datos sean correctos y matlab tenga acceso al hardware.
+
+3. **Compilar el nodo ROS2 en moso externo:**
+  - Hacer clic en ROS -> DEPLOY -> Build Model y esperar a que se compile el nodo. Este proceso puede tardar unos 15 minutos.
