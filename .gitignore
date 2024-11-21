@@ -5,8 +5,6 @@ DOCUMENTS/
 NatNetSDK/
 GUI/
 *.asv
-*matlab_msg_gen/
-*tcp_ros_msgs/
 *src/
 
 *slprj/
