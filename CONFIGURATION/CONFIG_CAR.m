@@ -2,9 +2,7 @@
 %% GENERAL CONFIGURATION
 %--------------------------------------------------------------
 % IP for SSH and TCP/IP communications
-% CAR_IP = '127.0.0.1';
-CAR_IP = '192.168.0.74';
-% CAR_IP = '10.42.0.19';
+CAR_IP = '192.168.0.112';
 % RUN_MODE DEFINITION
 % / 0. REAL-TIME SIMULATION / 1. FAST SIMULATION / 2. TEST VERIFICATION 
 % / 3. IMPLEMENTATION / 4. ALREADY DEPLOYED / 5. GAZEBO SIMULATION
@@ -18,7 +16,6 @@ VEHICLE_MODE = 0;
 SAMPLING_TIME = 10e-3;
 % The sampling time used in the control should be a multiple of the sampling time
 CONTROL_SAMPLING_TIME = 1*SAMPLING_TIME; 
-MCS_SAMPLING_TIME = 1*SAMPLING_TIME; % Not used
 
 %--------------------------------------------------------------
 %% STRUCT AND BUS DEFINITIONS
@@ -54,35 +51,20 @@ EKF_IMU_INI = CONFIG_EKF_IMU(MODEL_INI);
 EKF_WFL_INI = CONFIG_EKF_WFL(MODEL_INI);
 EKF_NAV_INI = CONFIG_EKF_NAV(MODEL_INI);
 cd ../../CONFIGURATION
-%------------------------------------
 %--------------------------------------------------------------
-% COMMUNICATIONS
-%--------------------------------------------------------------
-% cd ../SOFTWARE_COMPONENTS/COMMUNICATION--------------------------
 % CONTROL
 %--------------------------------------------------------------
 cd ../SOFTWARE_COMPONENTS/CONTROL
 MODEL_INI.PARAM.CONTROL_SAMPLING_TIME = CONTROL_SAMPLING_TIME;
 [CONTROL_INI,LIN_MODEL] = CONFIG_CONTROL(MODEL_INI);
-% EKF
 CONTROL_INI.EKF_IMU = EKF_IMU_INI;
 CONTROL_INI.EKF_WFL = EKF_WFL_INI;
 CONTROL_INI.EKF_NAV = EKF_NAV_INI;
-% WALL FOLLOWER MODE: / 0. RANGE SENSOR / 1. LIDAR 2D 
-% Option 1 only applies if EKF is enabled
-CONTROL_INI.EKF_WFL.PARAM.WALL_FOLLOWER_MODE = CONTROL_INI.STATE.WALL_FOLLOWER_MODE;
-% RC TRANSMITTER
 CONTROL_INI.PARAM.RC_CH_DEF = RCRX.CH_DEF;
 CONTROL_INI.PARAM.RC_CH_TRIM = RCRX.CH_TRIM;
 CONTROL_INI.PARAM.RC_CALIB_PARAM = RCRX.CALIB_PARAM;
-% CONTROL MODE
 MODEL_INI.PARAM.CONTROL_MODE = CONTROL_INI.STATE.CONTROL_MODE;
 MODEL_INI.PARAM.WALL_FOLLOWER_MODE = CONTROL_INI.STATE.WALL_FOLLOWER_MODE;
-% NAVIGATION
-CONTROL_INI = CONFIG_NAV(CONTROL_INI,LIN_MODEL);
-CONTROL_INI.STATE.CURRENT_STATUS_RPI4 = uint8(0);
-% ENCODER
-CONTROL_INI.PARAM.ENC_SAMPLING_TIME = 0.1*SAMPLING_TIME; % Not used
 cd ../../CONFIGURATION
 %--------------------------------------------------------------
 % COMMUNICATIONS
@@ -119,13 +101,11 @@ switch RUN_MODE
         set_param([MODEL_SLX '/Microseconds at Start'],'Commented','on');
         set_param([MODEL_SLX '/Microseconds at End'],'Commented','on');
         set_param([MODEL_SLX '/COMPUTATIONAL LOAD'],'Commented','on');
-        set_param([MODEL_SLX '/MONITORING'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/TEST: SCOPES'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/EXTERNAL MODE: SCOPES'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/SIMULATION: SCOPES'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/HARDWARE: SCOPES'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/COMMUNICATIONS'],'Commented','off');
-        set_param([MODEL_SLX '/MONITORING/BLACKBOX'],'Commented','on');
         set_param([MODEL_SLX '/SIMULATION/Real-Time Synchronization'],'Commented','off');
         set_param([MODEL_SLX '/GAZEBO SIMULATION'],'Commented','on');
         set_param(MODEL_SLX,'SimulationMode','Normal');
@@ -134,7 +114,7 @@ switch RUN_MODE
         % Communications mode
         CONTROL_INI.STATE.COMM_MODE = uint8(0);
         % Delay for control activation in the state machine
-        CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 0.5;
+        CONTROL_INI.STATE.DELAY = 0.5;
         % Closed-loop transfer-function filter activation
         for nn = 1:4
             set_param([MODEL_SLX '/MONITORING/SIMULATION: SCOPES/Second-order LPF ' num2str(nn)],'Commented','through');
@@ -153,7 +133,6 @@ switch RUN_MODE
         set_param([MODEL_SLX '/HARDWARE'],'Commented','on');
         set_param([MODEL_SLX '/SIMULATION'],'Commented','off');
         set_param([MODEL_SLX '/SIMULATION/Real-Time Synchronization'],'Commented','on');
-        set_param([MODEL_SLX '/MONITORING'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/TEST: SCOPES'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/HARDWARE: SCOPES'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/COMMUNICATIONS'],'Commented','on');
@@ -173,7 +152,7 @@ switch RUN_MODE
         clear nn
         %*************** CONTROL TYPE ****************
         % Delay in the state machine
-        CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 1;
+        CONTROL_INI.STATE.DELAY = 1;
         if CONTROL_INI.STATE.CONTROL_MODE == 1 % ATTITUDE CONTROL
             set_param([MODEL_SLX '/CONTROL/LOCAL TARGETS'],'Commented','off');
             set_param([MODEL_SLX '/MONITORING/SIMULATION: SCOPES'],'Commented','off');
@@ -192,7 +171,7 @@ switch RUN_MODE
        elseif CONTROL_INI.STATE.CONTROL_MODE == 3 % NAVIGATION
             set_param([MODEL_SLX '/CONTROL/LOCAL TARGETS'],'Commented','off');
             set_param([MODEL_SLX '/MONITORING/SIMULATION: SCOPES'],'Commented','off');
-            set_param([MODEL_SLX '/MONITORING/NAV COMPETITION: SCOPES'],'Commented','on');
+            set_param([MODEL_SLX '/MONITORING/NAV COMPETITION: SCOPES'],'Commented','off');
             set_param([MODEL_SLX '/MONITORING/FV COMPETITION: SCOPES'],'Commented','on');
             CONTROL_INI.STATE.CURRENT_STATUS_SYS = uint8(6);
             MODEL_INI.PARAM.SIM_FINAL_TIME = 160;
@@ -245,7 +224,7 @@ switch RUN_MODE
             CONTROL_INI.STATE.CURRENT_STATUS_SYS = uint8(3);
         end
         set_param(MODEL_SLX,'StopTime',num2str(MODEL_INI.PARAM.SIM_FINAL_TIME));
-        CONTROL_INI.INPUT.IMU_PITCH_ANG_INI = CONTROL_INI.PARAM.PA_INITIAL_VALUE;
+        CONTROL_INI.INPUT.IMU_PITCH_ANG_INI = CONTROL_INI.STATE.PA_INITIAL_VALUE;
         if CONTROL_INI.STATE.WALL_FOLLOWER_MODE
             MODEL_INI.STATE(6) = 0.25;
         else
@@ -263,7 +242,6 @@ switch RUN_MODE
         set_param([MODEL_SLX '/Microseconds at Start'],'Commented','on');
         set_param([MODEL_SLX '/Microseconds at End'],'Commented','on');
         set_param([MODEL_SLX '/COMPUTATIONAL LOAD'],'Commented','on');
-        set_param([MODEL_SLX '/MONITORING'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/EXTERNAL MODE: SCOPES'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/COMMUNICATIONS'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/TEST: SCOPES'],'Commented','off');
@@ -276,7 +254,7 @@ switch RUN_MODE
         % Communications mode
         CONTROL_INI.STATE.COMM_MODE = uint8(0);
         %*************** CONTROL TYPE ****************
-        CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 0;
+        CONTROL_INI.STATE.DELAY = 0;
         if CONTROL_INI.STATE.CONTROL_MODE == 1 % ATTITUDE CONTROL
             CONTROL_INI.STATE.CURRENT_STATUS_SYS = uint8(4);
         elseif CONTROL_INI.STATE.CONTROL_MODE == 2 % VELOCITY
@@ -299,10 +277,10 @@ switch RUN_MODE
         rpi = raspberrypi(CAR_IP,'pi','LabControl');
         try
             rpi.stopModel(MODEL_SLX);
-            rpi.system('rm -rf \MATLAB_ws/R2023b/CAR_CONTROL*')
-            rpi.system('rm -rf \MATLAB_ws/R2023b/D')
-            rpi.system('rm -rf \MATLAB_ws/R2023b/C')
-            rpi.system('rm -rf \MATLAB_ws/R2023b/Users')
+            rpi.system('rm -rf \MATLAB_ws/R2024a/CAR_CONTROL*')
+            rpi.system('rm -rf \MATLAB_ws/R2024a/D')
+            rpi.system('rm -rf \MATLAB_ws/R2024a/C')
+            rpi.system('rm -rf \MATLAB_ws/R2024a/Users')
             aux = datestr(now,'mm dd yyyy HH:MM:SS');
             rpi.system(['sudo date -s "' aux(7:10) '-' aux(1:2) '-' aux(4:5) ' ' aux(12:end) '"'])
         catch
@@ -317,7 +295,6 @@ switch RUN_MODE
         set_param([MODEL_SLX '/Microseconds at Start'],'Commented','off');
         set_param([MODEL_SLX '/Microseconds at End'],'Commented','off');
         set_param([MODEL_SLX '/COMPUTATIONAL LOAD'],'Commented','off');
-        set_param([MODEL_SLX '/MONITORING'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/EXTERNAL MODE: SCOPES'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/SIMULATION: SCOPES'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/HARDWARE: SCOPES'],'Commented','on');
@@ -331,17 +308,11 @@ switch RUN_MODE
         else
             set_param([MODEL_SLX '/HARDWARE/SENSORS/CURRENT_ADC_MCP3201_SPI'],'Commented','on');           
         end
-        % MCS enabled if needed
-        if CONTROL_INI.STATE.NAV_MODE == 1 || CONTROL_INI.STATE.MCS_MODE == 1
-            set_param([MODEL_SLX '/HARDWARE/COMMUNICATIONS/MCS_RX'],'Commented','off');
-        else
-            set_param([MODEL_SLX '/HARDWARE/COMMUNICATIONS/MCS_RX'],'Commented','on');
-        end
         set_param(MODEL_SLX,'SimulationMode','External');
         CONTROL_INI.STATE.CURRENT_STATUS_SYS = uint8(0);
         CONTROL_INI.STATE.CURRENT_STATUS_PC = uint8(0);
         % CONTROL_INI.STATE.COMM_MODE = uint8(1);
-        CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 0.5;         
+        CONTROL_INI.STATE.DELAY = 0.5;         
     %-------------------------------------
     case 4 % ALREADY DEPLOYED
     %-------------------------------------
@@ -349,22 +320,24 @@ switch RUN_MODE
         CONTROL_INI.STATE.CURRENT_STATUS_SYS = uint8(0);
         CONTROL_INI.STATE.CURRENT_STATUS_PC = uint8(0);
         if VEHICLE_MODE == 1
-            CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 0;
+            CONTROL_INI.STATE.DELAY = 0;
         else
-            CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 0.5;
+            CONTROL_INI.STATE.DELAY = 0.5;
         end
         % Communications mode
         % CONTROL_INI.STATE.COMM_MODE = uint8(1);
         cd('../SIMULINK');
         % bdclose(MODEL_SLX);
+        if CONTROL_INI.STATE.COMM_MODE==1 || CONTROL_INI.STATE.COMM_MODE==2
         open(PC_SLX);
         set_param([PC_SLX '/HARDWARE/RT_MONITORING'],'Commented','off');
         set_param([PC_SLX '/HARDWARE/ROS2_MONITORING'],'Commented','on');
         for ii = 1:21
-            set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP ' num2str(100+ii)],'Commented','on');
+                set_param([PC_SLX '/HARDWARE/COMMUNICATIONS/RT_MONITORING/TCP ' num2str(100+ii)],'Commented','on');
+            end
+            set_param([PC_SLX '/HARDWARE/COMMUNICATIONS/RT_MONITORING/TCP ' CAR_IP(end-2:end)],'Commented','off');
+            % set_param([PC_SLX '/HARDWARE/COMMUNICATIONS/RT_MONITORING/TCP RSP'],'Commented','off');
         end
-        set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP ' CAR_IP(end-2:end)],'Commented','off');
-        % set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP RSP'],'Commented','off');
         if CONTROL_INI.STATE.CONTROL_MODE == 5 % WALL-FOLLOWER COMPETITION
             CONTROL_INI.STATE.FV_TARGET_TYPE = uint8(0);
             CONTROL_INI.STATE.WD_TARGET_TYPE = uint8(0);
@@ -410,10 +383,6 @@ switch RUN_MODE
         end
         % Communications mode
         % CONTROL_INI.STATE.COMM_MODE = uint8(1);
-        cd('../SIMULINK');
-        open(PC_SLX);
-        set_param([PC_SLX '/HARDWARE/RT_MONITORING'],'Commented','on');
-        set_param([PC_SLX '/HARDWARE/ROS2_MONITORING'],'Commented','off');
     otherwise
 end
 
@@ -520,3 +489,8 @@ end
 
 clear MODEL_SLX
 
+if RUN_MODE==4 && CONTROL_INI.STATE.COMM_MODE==3
+    cd('../CONFIGURATION');
+    SEND_CONTROL_BUS
+    cd('../SIMULINK');
+end
