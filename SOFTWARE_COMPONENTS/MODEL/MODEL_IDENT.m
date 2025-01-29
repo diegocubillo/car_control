@@ -14,7 +14,7 @@
 % 8  : PITCH ANGLE
 % 9  : WALL DISTANCE & YAW RATE
 % 10  : FORWARD VELOCITY AND YAW RATE
-FIT_MODE = 5;
+FIT_MODE = 6;
 %--------------------------------------------------------------
 %% GENERAL CONFIGURATION
 %--------------------------------------------------------------

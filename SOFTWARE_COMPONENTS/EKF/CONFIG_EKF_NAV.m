@@ -36,17 +36,17 @@ EKF.STATE = zeros(EKF.PARAM.STATE_SIZE,1);
 % PROCESS NOISE STANDARD DEVIATIONS
 %--------------------------------------------------------------
 % Yaw angle (rad)
-YAW_ANG_STD = 1e-1;
+YAW_ANG_STD = 1;
 % Position XY in Earth reference frame (m)
-POS_XY_STD = 1;
+POS_XY_STD = 0.1;
 
 %--------------------------------------------------------------
 % OBSERVATION NOISE STANDARD DEVIATIONS
 %--------------------------------------------------------------
 % MCS Euler angle (rad)
-MCS_EULER_ANG_STD = 1e-2;
+MCS_EULER_ANG_STD = 0.01;
 % MCS Earth position (m)
-MCS_EARTH_POS_STD = 1e-1;
+MCS_EARTH_POS_STD = 0.01;
 
 %-------------------------------------------------------------------------
 % VARIANCE VECTORS

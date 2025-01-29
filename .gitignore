@@ -21,3 +21,5 @@ GUI/
 *.mexmaci64
 *.mexmaca64
 *SFB__sfcn_micros__SFB.mat
+
+.vscode/

@@ -3,10 +3,11 @@ function [MSG_LIST,MSG] = CONFIG_MSG(CONTROL)
 UART_MODE = CONTROL.STATE.UART_MODE; 
 %--------------------------------------------------------------
 % MESSAGE LIST
-% The maximum length of a message is 1400 bytes
+% The maximum length of a message is 500 bytes
 %--------------------------------------------------------------
 nn = 0;
 %--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%% SYSTEM & PC MONITORIZATION %%%%%%%%%%%%%%%%%%%%%%%%
 nn = nn+1; % MSG 1 - RPI TO PC (1 x UINT8 = 1 BYTE)
 MSG_LIST(nn).TYPE = '.STATE.';
 MSG_LIST(nn).LABELS = {'CURRENT_STATUS_SYS'};
@@ -15,138 +16,104 @@ nn = nn+1; % MSG 2 - PC TO RPI (4 x UINT8 = 4 BYTES)
 MSG_LIST(nn).TYPE = '.STATE.';
 MSG_LIST(nn).LABELS = {'CURRENT_STATUS_PC','PC_BUTTONS'};
 %--------------------------------------------------------------
-nn = nn+1; % MSG 3 - PC TO RPI (37 x UINT8 = 37 BYTES)
+%%%%%%%%%%%%%%%%%%% CONTROL PARAMETERS & CONFIGURATION %%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 3 - PC TO RPI (27 x UINT8 + 2 x SINGLE = 35 BYTES)
 MSG_LIST(nn).TYPE = '.STATE.';
 MSG_LIST(nn).LABELS = {'CONTROL_MODE','VEHICLE_MODE','COMM_MODE',...
                        'FORWARD_VEL_CONTROL_TYPE','YAW_RATE_CONTROL_TYPE',...
-                       'YAW_ANG_CONTROL_TYPE','WFL_CONTROL_TYPE','NAV_CONTROL_TYPE',...
+                       'YAW_ANG_CONTROL_TYPE','WFL_CONTROL_TYPE',...
                        'PITCH_ANG_CONTROL_TYPE','WFL_FEEDFORWARD',...
-                       'GAIN_SCHEDULING','MOTOR_DELAY_MODE',...
+                       'GAIN_SCHEDULING','SP_MODE','MOTOR_DELAY_MODE',...
                        'OBSERVER_MODE','FORWARD_VEL_MAIN_OP',...
                        'ROTATION_MSRT_MODE','MCS_MODE','NAV_MODE',...
-                       'YA_TARGET_SOURCE','FV_TARGET_SOURCE','YA_TARGET_TYPE',...
-                       'YR_TARGET_SOURCE','WD_TARGET_SOURCE','NAV_TARGET_SOURCE',...
+                       'MV_TARGET_SOURCE','YA_TARGET_SOURCE'...
+                       'FV_TARGET_SOURCE','FV_TARGET_VALUE',...
+                       'YR_TARGET_SOURCE','WD_TARGET_SOURCE',...
+                       'MV_TARGET_TYPE','YA_TARGET_TYPE',...
                        'YR_TARGET_TYPE','FV_TARGET_TYPE','WD_TARGET_TYPE',...
-                       'FILTER_CHANGE','STR_MODE','WALL_FOLLOWER_MODE',....
-                       'SP_MODE','MV_TARGET_SOURCE','MV_TARGET_TYPE','NAV_TARGET_TYPE'};
+                       'FILTER_CHANGE','STR_MODE','DELAY','WALL_FOLLOWER_MODE'....
+                       'PA_INITIAL_VALUE'};
 %--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% OPERATING POINT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 nn = nn+1; % MSG 4 - PC TO RPI (56 x SINGLE = 224 BYTES)
 MSG_LIST(nn).TYPE = '.PARAM.';
 MSG_LIST(nn).LABELS = {'OP_INPUT','OP_STATE','OP_OUTPUT'};
 %--------------------------------------------------------------
-nn = nn+1; % MSG 5 - PC TO RPI (60 x SINGLE = 240 BYTES)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RECEIVER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 5 - PC TO RPI (24 x SINGLE = 96 BYTES)
 MSG_LIST(nn).TYPE = '.PARAM.';
-MSG_LIST(nn).LABELS = {'OPL_RC_SCALE','VEL_RC_SCALE','WFL_RC_SCALE','NAV_RC_SCALE',...
-                       'OPL_RC_SWITCH','VEL_RC_SWITCH','WFL_RC_SWITCH','NAV_RC_SWITCH',...
-                       'FORWARD_VEL_DB.NUM','FORWARD_VEL_DB.DEN',...
-                       'YAW_RATE_DB.NUM','YAW_RATE_DB.DEN',...
-                       'NAV_SFC.INT_DISC_TYPE','NAV_SFC.ANTIWINDUP',...
-                       'NAV_STOP_RADIUS','NAV_MAX_TARGET_RADIUS',...
-                       'NAV_SFC.COS_ANG','NAV_SFC.FV','NAV_SFC.INV_DIST'};
+MSG_LIST(nn).LABELS = {'OPL_RC_SCALE','VEL_RC_SCALE','WFL_RC_SCALE',...
+                       'OPL_RC_SWITCH','VEL_RC_SWITCH','WFL_RC_SWITCH'};
 %--------------------------------------------------------------
-nn = nn+1; % MSG 6 - PC TO RPI (20 x UINT8 + 55 x SINGLE = 240 BYTES)
-MSG_LIST(nn).TYPE = '.PARAM.';
-MSG_LIST(nn).LABELS = {'FORWARD_VEL_PID.K','FORWARD_VEL_PID.Ti','FORWARD_VEL_PID.Td',...
-                       'FORWARD_VEL_PID.N','FORWARD_VEL_PID.b',...
-                       'FORWARD_VEL_PID.INT_DISC_TYPE','FORWARD_VEL_PID.DER_DISC_TYPE',...
-                       'FORWARD_VEL_PID.DER_INPUT','FORWARD_VEL_PID.ANTIWINDUP',...
-                       'YAW_RATE_PID.K','YAW_RATE_PID.Ti','YAW_RATE_PID.Td',...
-                       'YAW_RATE_PID.N','YAW_RATE_PID.b',...
-                       'YAW_RATE_PID.INT_DISC_TYPE','YAW_RATE_PID.DER_DISC_TYPE',...
-                       'YAW_RATE_PID.DER_INPUT','YAW_RATE_PID.ANTIWINDUP',...
-                       'YAW_ANG_PID.K','YAW_ANG_PID.Ti','YAW_ANG_PID.Td',...
-                       'YAW_ANG_PID.N','YAW_ANG_PID.b',...
-                       'YAW_ANG_PID.INT_DISC_TYPE','YAW_ANG_PID.DER_DISC_TYPE',...
-                       'YAW_ANG_PID.DER_INPUT','YAW_ANG_PID.ANTIWINDUP',...
-                       'WFL_SL_PID.K','WFL_SL_PID.Ti','WFL_SL_PID.Td',...
-                       'WFL_SL_PID.N','WFL_SL_PID.b',...
-                       'WFL_SL_PID.INT_DISC_TYPE','WFL_SL_PID.DER_DISC_TYPE',...
-                       'WFL_SL_PID.DER_INPUT','WFL_SL_PID.ANTIWINDUP',...
-                       'WFL_CD_PID.K','WFL_CD_PID.Ti','WFL_CD_PID.Td',...
-                       'WFL_CD_PID.N','WFL_CD_PID.b',...
-                       'WFL_CD_PID.INT_DISC_TYPE','WFL_CD_PID.DER_DISC_TYPE',...
-                       'WFL_CD_PID.DER_INPUT','WFL_CD_PID.ANTIWINDUP'};
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% YAW ANGLE PID %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 6 - PC TO RPI (4 x UINT8 + 5 x SINGLE = 24 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.YAW_ANG_PID.';
+MSG_LIST(nn).LABELS = {'K','Ti','Td','N','b','INT_DISC_TYPE',...
+                       'DER_DISC_TYPE','DER_INPUT','ANTIWINDUP'};
 %--------------------------------------------------------------
-nn = nn+1; % MSG 7 - PC TO RPI (6 x UINT8 + 56 x SINGLE = 230 BYTES)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% FORWARD VEL PID %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 7 - PC TO RPI (4 x UINT8 + 5 x SINGLE = 24 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.FORWARD_VEL_PID.';
+MSG_LIST(nn).LABELS = {'K','Ti','Td','N','b','INT_DISC_TYPE',...
+                       'DER_DISC_TYPE','DER_INPUT','ANTIWINDUP'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% YAW RATE PID %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 8 - PC TO RPI (4 x UINT8 + 5 x SINGLE = 24 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.YAW_RATE_PID.';
+MSG_LIST(nn).LABELS = {'K','Ti','Td','N','b','INT_DISC_TYPE',...
+                       'DER_DISC_TYPE','DER_INPUT','ANTIWINDUP'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%% FORWARD VEL SFC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 9 - PC TO RPI (2 x UINT8 + 4 x SINGLE = 18 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.FORWARD_VEL_SFC.';
+MSG_LIST(nn).LABELS = {'K','Ki','INT_DISC_TYPE','ANTIWINDUP'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% YAW RATE SFC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 10 - PC TO RPI (2 x UINT8 + 2 x SINGLE = 10 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.YAW_RATE_SFC.';
+MSG_LIST(nn).LABELS = {'K','Ki','INT_DISC_TYPE','ANTIWINDUP'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% YAW ANG SFC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 11 - PC TO RPI (2 x UINT8 + 3 x SINGLE = 14 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.YAW_ANG_SFC.';
+MSG_LIST(nn).LABELS = {'K','Ki','INT_DISC_TYPE','ANTIWINDUP'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%% WALL FOLLOWER SFC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 12 - PC TO RPI (12 x SINGLE = 48 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.WFL_SFC.';
+MSG_LIST(nn).LABELS = {'K'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%% WALL FOLLOWER SL PID %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 13 - PC TO RPI (4 x UINT8 + 20 x SINGLE = 84 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.WFL_SL_PID.';
+MSG_LIST(nn).LABELS = {'K','Ti','Td','N','b','INT_DISC_TYPE',...
+                       'DER_DISC_TYPE','DER_INPUT','ANTIWINDUP'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%% WALL FOLLOWER CD PID %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 14 - PC TO RPI (4 x UINT8 + 20 x SINGLE = 84 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.WFL_CD_PID.';
+MSG_LIST(nn).LABELS = {'K','Ti','Td','N','b','INT_DISC_TYPE',...
+                       'DER_DISC_TYPE','DER_INPUT','ANTIWINDUP'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%% NAVIGATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 15 - PC TO RPI (1 x SINGLE = 4 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.NAV_MPC.';
+MSG_LIST(nn).LABELS = {'PRED_HRZ'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%% FILTERS PARAM %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 16 - PC TO RPI (55 x SINGLE = 220 BYTES)
 MSG_LIST(nn).TYPE = '.PARAM.';
-MSG_LIST(nn).LABELS = {'FORWARD_VEL_SFC.K','FORWARD_VEL_SFC.Ki',...
-                       'FORWARD_VEL_SFC.INT_DISC_TYPE','FORWARD_VEL_SFC.ANTIWINDUP',...
-                       'YAW_RATE_SFC.K','YAW_RATE_SFC.Ki',...
-                       'YAW_RATE_SFC.INT_DISC_TYPE','YAW_RATE_SFC.ANTIWINDUP',...
-                       'YAW_ANG_SFC.K','YAW_ANG_SFC.Ki',...
-                       'YAW_ANG_SFC.INT_DISC_TYPE','YAW_ANG_SFC.ANTIWINDUP',...
-                       'WFL_SFC.K','PITCH_ANG_SFC.K',...
-                       'CONTROL_SAMPLING_TIME','IMU_FILT_FREQ','ENC_FILT_FREQ','EKF_FILT_FREQ',...
-                       'WFL_FILT_FREQ','IMU_CF_FREQ','VEL_GAIN','VEL_TIME_CONSTANT',...
+MSG_LIST(nn).LABELS = {'CONTROL_SAMPLING_TIME',...
+                       'IMU_FILT_FREQ','ENC_FILT_FREQ','EKF_FILT_FREQ',...
+                       'WFL_FILT_FREQ','IMU_CF_FREQ',...
+                       'VEL_GAIN','VEL_TIME_CONSTANT',...
                        'YAW_RATE_GAIN','YAW_RATE_TIME_CONSTANT',...
                        'MOTOR_DELAY','MOTOR_DELAY_ERR','MOTOR_VOLT_DROP_DIF',...
-                       'MCS_ALFA_CALIB','NAV_ALFA_CALIB',...
-                       'MOTOR_VOLT_MAX','MOTOR_VOLT_MIN','MOTOR_DEAD_ZONE','MOTOR_PWM_SLOPE'};
-%--------------------------------------------------------------                   
-nn = nn+1; % MSG 8 - PC TO RPI (57 x SINGLE = 228 BYTES)
-MSG_LIST(nn).TYPE = '.PARAM.';
-MSG_LIST(nn).LABELS = {'ENC_FORWARD_VEL_matAd','ENC_FORWARD_VEL_matBd',...
-                       'ENC_FORWARD_VEL_matCd','ENC_FORWARD_VEL_matQ','ENC_FORWARD_VEL_matR',...
-                       'ENC_YAW_RATE_matAd','ENC_YAW_RATE_matBd',...
-                       'ENC_YAW_RATE_matCd','ENC_YAW_RATE_matQ','ENC_YAW_RATE_matR'};
+                       'MOTOR_VOLT_MAX','MOTOR_VOLT_MIN','MOTOR_DEAD_ZONE','MOTOR_PWM_SLOPE',...
+                       'VEL_MAG_MAX','MCS_ALFA_CALIB','NAV_ALFA_CALIB'};
 %--------------------------------------------------------------
-nn = nn+1; % MSG 9 - PC TO RPI (43 x SINGLE = 172 BYTES)
-MSG_LIST(nn).TYPE = '.PARAM.';
-MSG_LIST(nn).LABELS = {'MISSION_NUM_WAYPOINTS','MISSION_WAYPOINTS',...
-                       'MISSION_WP_RADIUS','MISSION_YA_ERROR'};
-%--------------------------------------------------------------                   
-nn = nn+1; % MSG 10 - PC TO RPI (53 x SINGLE = 212 BYTES)
-MSG_LIST(nn).TYPE = '.';
-MSG_LIST(nn).LABELS = {'EKF_WFL.PARAM.RANGE_XA','EKF_WFL.PARAM.RANGE_YA',...
-                       'EKF_WFL.PARAM.LIDAR_2D_XA','EKF_WFL.PARAM.LIDAR_2D_YA',...
-                       'EKF_WFL.PARAM.LIDAR_2D_WFL_ANG_OFFS','EKF_WFL.PARAM.LIDAR_2D_WFL_ANG_SIGN',...
-                       'EKF_WFL.PROCESS_NOISE_VAR','EKF_WFL.OBSRV_NOISE_VAR',...
-                       'EKF_NAV.PROCESS_NOISE_VAR','EKF_NAV.OBSRV_NOISE_VAR',...
-                       'EKF_IMU.PARAM.ACCEL_ADPTV_GAIN','EKF_IMU.PROCESS_NOISE_VAR','EKF_IMU.OBSRV_NOISE_VAR',...
-                       'PARAM.SVF_Ad','PARAM.SVF_B1d','PARAM.SVF_B2d','PARAM.SVF_Cd','PARAM.SVF_Dd',...
-                       'PARAM.CONTROL_ACT_DELAY','PARAM.PA_INITIAL_VALUE','PARAM.FV_TARGET_VALUE','PARAM.NAV_TARGET_VALUE'};
-%--------------------------------------------------------------
-% MSG 11-42 - PC TO RPI (63 x SINGLE = 252 BYTES / 62 x SINGLE = 248 BYTES)
-for ii = 1:16
-    nn = nn+1;
-    MSG_LIST(nn).TYPE = '.PARAM.NAV_SFC.';
-    MSG_LIST(nn).LABELS = {['KPP(1:63,' num2str(ii) ')']};
-    nn = nn+1;
-    MSG_LIST(nn).TYPE = '.PARAM.NAV_SFC.';
-    MSG_LIST(nn).LABELS = {['KPP(64:125,' num2str(ii) ')']};
-end
-%--------------------------------------------------------------
-% MSG 43-74 - PC TO RPI (63 x SINGLE = 252 BYTES / 62 x SINGLE = 248 BYTES)
-for ii = 1:16
-    nn = nn+1;
-    MSG_LIST(nn).TYPE = '.PARAM.NAV_SFC.';
-    MSG_LIST(nn).LABELS = {['KPN(1:63,' num2str(ii) ')']};
-    nn = nn+1;
-    MSG_LIST(nn).TYPE = '.PARAM.NAV_SFC.';
-    MSG_LIST(nn).LABELS = {['KPN(64:125,' num2str(ii) ')']};
-end
-%--------------------------------------------------------------
-% MSG 75-106 - PC TO RPI (63 x SINGLE = 252 BYTES / 62 x SINGLE = 248 BYTES)
-for ii = 1:16
-    nn = nn+1;
-    MSG_LIST(nn).TYPE = '.PARAM.NAV_SFC.';
-    MSG_LIST(nn).LABELS = {['KNP(1:63,' num2str(ii) ')']};
-    nn = nn+1;
-    MSG_LIST(nn).TYPE = '.PARAM.NAV_SFC.';
-    MSG_LIST(nn).LABELS = {['KNP(64:125,' num2str(ii) ')']};
-end
-%--------------------------------------------------------------
-% MSG 107-138 - PC TO RPI (63 x SINGLE = 252 BYTES / 62 x SINGLE = 248 BYTES)
-for ii = 1:16
-    nn = nn+1;
-    MSG_LIST(nn).TYPE = '.PARAM.NAV_SFC.';
-    MSG_LIST(nn).LABELS = {['KNN(1:63,' num2str(ii) ')']};
-    nn = nn+1;
-    MSG_LIST(nn).TYPE = '.PARAM.NAV_SFC.';
-    MSG_LIST(nn).LABELS = {['KNN(64:125,' num2str(ii) ')']};
-end
-%--------------------------------------------------------------
-nn = nn+1; % MSG 139 - RPI TO PC (46 x SINGLE = 184 BYTES)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% HW MONITORIZATION 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 17 - RPI TO PC (47 x SINGLE = 188 BYTES)
 MSG_LIST(nn).TYPE = '.INPUT.';
 MSG_LIST(nn).LABELS = {'BATTERY_VOLT','CHARGING_CURRENT',...
                        'IMU_ACCEL_MEAN','IMU_ACCEL_MEAN_FILT','IMU_GYRO_MEAN','IMU_GYRO_MEAN_FILT',...
@@ -160,56 +127,100 @@ MSG_LIST(nn).LABELS = {'BATTERY_VOLT','CHARGING_CURRENT',...
                        'ENC_YAW_RATE_LPF','ENC_YAW_RATE_KF',...
                        'ENC_YAW_ANG','ENC_YAW_ANG_LPF','ENC_YAW_ANG_KF'};
 %--------------------------------------------------------------                   
-nn = nn+1; % MSG 140 - RPI TO PC (6 x SINGLE = 24 BYTES)
+nn = nn+1; % MSG 18 - RPI TO PC (6 x SINGLE = 24 BYTES)
 MSG_LIST(nn).TYPE = '.OUTPUT.';
 MSG_LIST(nn).LABELS = {'MOTOR_PWM','MOTOR_VOLT','MOTOR_VOLT_CD'};
 %-------------------------------------------------------------- 
-nn = nn+1; % MSG 141 - RPI TO PC (7 x UINT8 + 2 x SINGLE = 15 BYTES)
+nn = nn+1; % MSG 19 - RPI TO PC (6 x UINT8 + 2 x SINGLE = 14 BYTES)
 MSG_LIST(nn).TYPE = '.STATE.';
 MSG_LIST(nn).LABELS = {'BUTTONS','MOTOR_MODE','CPU_LOAD','MCS_RX_STATUS',...
                        'NAV_RX_STATUS','COMP_TIME','COMP_IAE'};
 %--------------------------------------------------------------                   
-nn = nn+1; % MSG 142 - RPI TO PC (9 x SINGLE = 36 BYTES)
+nn = nn+1; % MSG 20 - RPI TO PC (9 x SINGLE = 36 BYTES)
 MSG_LIST(nn).TYPE = '.TARGET.';
 MSG_LIST(nn).LABELS = {'YAW_RATE_REF','YAW_ANG_REF','PITCH_ANG_REF','FORWARD_VEL_REF',...
                        'WALL_DIST_REF','POS_XY_REF','VEL_XY_REF'};
 %--------------------------------------------------------------                   
-nn = nn+1; % MSG 143 - RPI TO PC (1 x UINT8 + 10 x SINGLE = 41 BYTES)
+nn = nn+1; % MSG 21 - RPI TO PC (1 x UINT8 + 10 x SINGLE = 41 BYTES)
 MSG_LIST(nn).TYPE = '.PARAM.';
 MSG_LIST(nn).LABELS = {'VEL_GAIN_EST','VEL_TIME_CONSTANT_EST','FILT_TIME_CONSTANT_EST',...
                        'FV_PI_STR_K','FV_PI_STR_Ti','FV_PI_STR_b','ADPT_FLAG',...
                        'FORWARD_VEL_PID.K','FORWARD_VEL_PID.Ti','FORWARD_VEL_PID.b',...
                        'FILT_TIME_CONSTANT_ACT'};
+%--------------------------------------------------------------                   
+nn = nn+1; % MSG 22 - PC TO RPI (7 x SINGLE = 28 BYTES)
+MSG_LIST(nn).TYPE = '.EKF_WFL.';
+MSG_LIST(nn).LABELS = {'PARAM.RANGE_XA','PARAM.RANGE_YA',...
+                       'PARAM.LIDAR_2D_XA','PARAM.LIDAR_2D_YA',...
+                       'PARAM.LIDAR_2D_WFL_ANG_OFFS','PARAM.LIDAR_2D_WFL_ANG_SIGN',...
+                       'PROCESS_NOISE_VAR','OBSRV_NOISE_VAR'};
+%--------------------------------------------------------------                   
+nn = nn+1; % MSG 23 - PC TO RPI (57 x SINGLE = 228 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.';
+MSG_LIST(nn).LABELS = {'ENC_FORWARD_VEL_matAd','ENC_FORWARD_VEL_matBd',...
+                       'ENC_FORWARD_VEL_matCd','ENC_FORWARD_VEL_matQ','ENC_FORWARD_VEL_matR',...
+                       'ENC_YAW_RATE_matAd','ENC_YAW_RATE_matBd',...
+                       'ENC_YAW_RATE_matCd','ENC_YAW_RATE_matQ','ENC_YAW_RATE_matR'};
 %--------------------------------------------------------------
-nn = nn+1; % MSG 144 - RPI TO PC (44 x SINGLE = 176 BYTES)
+nn = nn+1; % MSG 24 - PC TO RPI (17 x SINGLE = 68 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.';
+MSG_LIST(nn).LABELS = {'SVF_Ad','SVF_B1d','SVF_B2d','SVF_Cd','SVF_Dd'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% HW MONITORIZATION 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 25 - RPI TO PC (45 x SINGLE = 180 BYTES)
 MSG_LIST(nn).TYPE = '.INPUT.';
 MSG_LIST(nn).LABELS = {'RANGE_FRONT_DIST','RANGE_REAR_DIST',...
                        'RANGE_WALL_DIST','LIDAR_2D_WALL_DIST','WALL_DIST_FILT','WALL_DIST_KF',...
                        'RANGE_WALL_ANG','LIDAR_2D_WALL_ANG','WALL_ANG_FILT','WALL_ANG_KF',...
                        'MCS_EULER_ANG','MCS_EARTH_POS','NAV_EULER_ANG','NAV_EARTH_POS',...
-                       'NAV_EARTH_POS_FILT','NAV_EARTH_VEL_FILT','MOTOR_RATE','MOTOR_RATE_CD',...
+                       'NAV_EARTH_POS_FILT','NAV_EARTH_VEL_FILT',...
+                       'MOTOR_RATE','MOTOR_RATE_CD',...
                        'WALL_DIST','FORWARD_VEL','YAW_RATE','PITCH_RATE',...
                        'YAW_ANG','PITCH_ANG','EARTH_POS','EARTH_VEL'};
-
+%--------------------------------------------------------------                   
+nn = nn+1; % MSG 26 - PC TO RPI (6 x SINGLE = 24 BYTES)
+MSG_LIST(nn).TYPE = '.EKF_NAV.';
+MSG_LIST(nn).LABELS = {'PROCESS_NOISE_VAR','OBSRV_NOISE_VAR'};
+%--------------------------------------------------------------
+nn = nn+1; % MSG 27 - PC TO RPI (14 x SINGLE = 56 BYTES)
+MSG_LIST(nn).TYPE = '.EKF_IMU.';
+MSG_LIST(nn).LABELS = {'PARAM.ACCEL_ADPTV_GAIN','PROCESS_NOISE_VAR','OBSRV_NOISE_VAR'};
+%--------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%% PITCH ANGLE SFC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nn = nn+1; % MSG 28 - PC TO RPI (12 x SINGLE = 48 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.PITCH_ANG_SFC.';
+MSG_LIST(nn).LABELS = {'K'};
+%--------------------------------------------------------------
+nn = nn+1; % MSG 29 - PC TO RPI ()
+MSG_LIST(nn).TYPE = '.TARGET.';
+MSG_LIST(nn).LABELS = {'MISSION_NUM_WAYPOINTS','MISSION_WAYPOINTS',...
+                       'MISSION_WP_RADIUS','MISSION_YA_ERROR'};
+%--------------------------------------------------------------
+nn = nn+1; % MSG 30 - PC TO RPI (10 x SINGLE = 40 BYTES)
+MSG_LIST(nn).TYPE = '.PARAM.';
+MSG_LIST(nn).LABELS = {'FORWARD_VEL_DB.NUM','FORWARD_VEL_DB.DEN',...
+                       'YAW_RATE_DB.NUM','YAW_RATE_DB.DEN'};
 %--------------------------------------------------------------
 NUM_MSG = nn;
 %--------------------------------------------------------------
 % MESSAGE IDs LIST
 %--------------------------------------------------------------
 if UART_MODE == 1
-    MSG.MSG_ID_LIST = [uint8([  3  4  5  6  7  8  9  0]'),...
-                       uint8([ 10 11 12 13 14  0  0  0]')];
-    for ii=15:5:134
-        MSG.MSG_ID_LIST = [MSG.MSG_ID_LIST uint8([ii ii+1 ii+2 ii+3 ii+4 0 0 0]')];
-    end
-    MSG.MSG_ID_LIST = [MSG.MSG_ID_LIST uint8([135 136 137 138 0 0 0 0]')];
+    MSG.MSG_ID_LIST = [uint8([3 4 0 0 0 0 0 0]'),...
+                       uint8([5 6 7 8 9 10 11 0]'),...
+                       uint8([12 13 14 15 0 0 0 0]'),...                                              
+                       uint8([16 22 0 0 0 0 0]'),...
+                       uint8([23 24 0 0 0 0 0 0]'),...
+                       uint8([26 27 28 30 0 0 0 0]'),...
+                       uint8([29 0 0 0 0 0 0 0]')];
 else
-    MSG.MSG_ID_LIST = [uint8([2  3  4  5  6  7  8  9]'),...
-                       uint8([2 10 11 12 13 14  0  0]')];
-    for ii=15:5:134
-        MSG.MSG_ID_LIST = [MSG.MSG_ID_LIST uint8([2 ii ii+1 ii+2 ii+3 ii+4 0 0]')];
-    end
-    MSG.MSG_ID_LIST = [MSG.MSG_ID_LIST uint8([2 135 136 137 138 0 0 0]')];
+    MSG.MSG_ID_LIST = [uint8([2 3 4 0 0 0 0 0]'),...
+                       uint8([2 5 6 7 8 9 10 11]'),...
+                       uint8([2 12 13 14 15 0 0 0]'),...
+                       uint8([2 16 22 0 0 0 0 0]'),...
+                       uint8([2 23 24 0 0 0 0 0]'),...
+                       uint8([2 26 27 28 30 0 0 0]'),...
+                       uint8([2 29 0 0 0 0 0 0]')];
 end
 %--------------------------------------------------------------
 % MESSAGE CODER
@@ -234,17 +245,9 @@ for nn=1:NUM_MSG
         end        
         if strcmp(class_field,'double')
             if prod(nd)==1
-                if FIELD(end)==')'
-                    command = sprintf('DATA = [ DATA ; typecast(single(%s),''uint8'')''];\n',FIELD);
-                else
-                    command = sprintf('DATA = [ DATA ; typecast(single(%s(:)),''uint8'')''];\n',FIELD);
-                end
+                command = sprintf('DATA = [ DATA ; typecast(single(%s(:)),''uint8'')''];\n',FIELD);
             else
-                if FIELD(end)==')'
-                    command = sprintf('DATA = [ DATA ; typecast(single(%s),''uint8'')];\n',FIELD);
-                else
-                    command = sprintf('DATA = [ DATA ; typecast(single(%s(:)),''uint8'')];\n',FIELD);
-                end
+                command = sprintf('DATA = [ DATA ; typecast(single(%s(:)),''uint8'')];\n',FIELD);
             end
         else
             command = sprintf('DATA = [ DATA ; %s(:)];\n',FIELD);
@@ -296,8 +299,8 @@ end
 %--------------------------------------------------------------
 % MESSAGE STRUCT DEFINITION
 %--------------------------------------------------------------
-MSG.RX_BUFFER = zeros(1400,1,'uint8');
-MSG.TX_BUFFER = zeros(1400,1,'uint8');
+MSG.RX_BUFFER = zeros(500,1,'uint8');
+MSG.TX_BUFFER = zeros(500,1,'uint8');
 MSG.TX_ID = zeros(8,1,'uint8');
 
 %--------------------------------------------------------------
@@ -323,7 +326,7 @@ command = sprintf('%%-----------------------------------------------------------
 CoderFunction = [CoderFunction command];
 % Header (2*num_msg + 1)
 % [num_msg / msg_id(1) / msg_len(1) / ... / msg_id(num_msg) / msg_len(num_msg) /]
-command = sprintf('TX_ID = MSG.TX_ID(MSG.TX_ID>0);\n');
+command = sprintf('TX_ID = sort(MSG.TX_ID(MSG.TX_ID>0));\n');
 CoderFunction = [CoderFunction command];
 command = sprintf('NUM_MSG = uint8(length(TX_ID));\n');
 CoderFunction = [CoderFunction command];
@@ -360,7 +363,7 @@ command = sprintf('BUFFER = [HEADER ; BUFFER];\n');
 CoderFunction = [CoderFunction command];
 command = sprintf('BUFFER_LEN = length(BUFFER);\n');
 CoderFunction = [CoderFunction command];
-command = sprintf('MSG.TX_BUFFER = zeros(1400,1,''uint8'');\n');
+command = sprintf('MSG.TX_BUFFER = zeros(500,1,''uint8'');\n');
 CoderFunction = [CoderFunction command];
 command = sprintf('MSG.TX_BUFFER(1:BUFFER_LEN) = BUFFER;\n');
 CoderFunction = [CoderFunction command];
@@ -395,7 +398,7 @@ command = sprintf('NUM_MSG = double(BUFFER(1));\n');
 DecoderFunction = [DecoderFunction command];
 command = sprintf('HEADER = BUFFER(1:2*NUM_MSG+1);\n');
 DecoderFunction = [DecoderFunction command];
-command = sprintf('RX_ID = HEADER(2:2:end);\n');
+command = sprintf('RX_ID = sort(HEADER(2:2:end));\n');
 DecoderFunction = [DecoderFunction command];
 command = sprintf('MSG_LEN = double(HEADER(3:2:end));\n');
 DecoderFunction = [DecoderFunction command];

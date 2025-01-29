@@ -32,9 +32,11 @@ EKF.PARAM.LIDAR_2D_XA = MODEL.PARAM.LIDAR_2D_XA;
 % yA: midle-point lidar sensor distance in y-axis (m)
 EKF.PARAM.LIDAR_2D_YA = MODEL.PARAM.LIDAR_2D_YA;
 % Angle offset for wall following (deg)
-EKF.PARAM.LIDAR_2D_WFL_ANG_OFFS = 0;
+EKF.PARAM.LIDAR_2D_WFL_ANG_OFFS = 270;
 % Angle sign for wall following (1 or -1)
-EKF.PARAM.LIDAR_2D_WFL_ANG_SIGN = 1;
+EKF.PARAM.LIDAR_2D_WFL_ANG_SIGN = -1;
+% WALL FOLLOWER MODE: / 0. RANGE SENSOR / 1. LIDAR 2D 
+EKF.PARAM.WALL_FOLLOWER_MODE = uint8(0);
 
 %-------------------------------------------------------------------------
 %% INITIALIZATION

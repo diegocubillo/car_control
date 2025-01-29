@@ -8,11 +8,11 @@
  *   Builder which only recognizes certain fields.  Changes made
  *   outside these fields will be lost the next time the block is
  *   used to load, edit, and resave this file. This file will be overwritten
- *   by the S-function Builder block. If you want to edit this file by hand,
- *   you must change it only in the area defined as:
+ *   by the S-function Builder block. If you want to edit this file by hand, 
+ *   you must change it only in the area defined as:  
  *
  *        %%%-SFUNWIZ_defines_Changes_BEGIN
- *        #define NAME 'replacement text'
+ *        #define NAME 'replacement text' 
  *        %%% SFUNWIZ_defines_Changes_END
  *
  *   DO NOT change NAME--Change the 'replacement text' only.
@@ -24,61 +24,61 @@
  *
  *  -------------------------------------------------------------------------
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
- *  -------------------------------------------------------------------------
+ *  ------------------------------------------------------------------------- 
  *
- * Created: Fri Jul 14 15:44:27 2023
+ * Created: Mon Dec 07 17:37:43 2020
  */
 
-#define S_FUNCTION_LEVEL               2
-#define S_FUNCTION_NAME                sfcn_micros
-
+#define S_FUNCTION_LEVEL 2
+#define S_FUNCTION_NAME sfcn_micros
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     0
-#define NUM_OUTPUTS                    1
+#define NUM_INPUTS            0
 
+#define NUM_OUTPUTS           1
 /* Output Port  0 */
-#define OUT_PORT_0_NAME                microseconds
-#define OUTPUT_0_DIMS_ND               {1,1}
-#define OUTPUT_0_NUM_ELEMS             1
-#define OUTPUT_0_WIDTH                 1
-#define OUTPUT_DIMS_0_COL              1
-#define OUTPUT_0_DTYPE                 uint32_T
-#define OUTPUT_0_COMPLEX               COMPLEX_NO
-#define OUT_0_BUS_BASED                0
-#define OUT_0_BUS_NAME
-#define OUT_0_DIMS                     1-D
-#define OUT_0_ISSIGNED                 1
-#define OUT_0_WORDLENGTH               8
-#define OUT_0_FIXPOINTSCALING          1
-#define OUT_0_FRACTIONLENGTH           3
-#define OUT_0_BIAS                     0
-#define OUT_0_SLOPE                    0.125
-#define NPARAMS                        0
-#define SAMPLE_TIME_0                  INHERITED_SAMPLE_TIME
-#define NUM_DISC_STATES                1
-#define DISC_STATES_IC                 [0]
-#define NUM_CONT_STATES                0
-#define CONT_STATES_IC                 [0]
-#define SFUNWIZ_GENERATE_TLC           1
-#define SOURCEFILES                    "__SFB__"
-#define PANELINDEX                     N/A
-#define USE_SIMSTRUCT                  0
-#define SHOW_COMPILE_STEPS             0
-#define CREATE_DEBUG_MEXFILE           0
-#define SAVE_CODE_ONLY                 1
-#define SFUNWIZ_REVISION               3.0
+#define OUT_PORT_0_NAME       microseconds
+#define OUTPUT_0_WIDTH        1
+#define OUTPUT_DIMS_0_COL     1
+#define OUTPUT_0_DTYPE        uint32_T
+#define OUTPUT_0_COMPLEX      COMPLEX_NO
+#define OUT_0_FRAME_BASED     FRAME_NO
+#define OUT_0_BUS_BASED       0
+#define OUT_0_BUS_NAME        
+#define OUT_0_DIMS            1-D
+#define OUT_0_ISSIGNED        1
+#define OUT_0_WORDLENGTH      8
+#define OUT_0_FIXPOINTSCALING 1
+#define OUT_0_FRACTIONLENGTH  3
+#define OUT_0_BIAS            0
+#define OUT_0_SLOPE           0.125
 
+#define NPARAMS               0
+
+#define SAMPLE_TIME_0         INHERITED_SAMPLE_TIME
+#define NUM_DISC_STATES       1
+#define DISC_STATES_IC        [0]
+#define NUM_CONT_STATES       0
+#define CONT_STATES_IC        [0]
+
+#define SFUNWIZ_GENERATE_TLC  1
+#define SOURCEFILES           "__SFB__"
+#define PANELINDEX            N/A
+#define USE_SIMSTRUCT         0
+#define SHOW_COMPILE_STEPS    0
+#define CREATE_DEBUG_MEXFILE  0
+#define SAVE_CODE_ONLY        0
+#define SFUNWIZ_REVISION      3.0
 /* %%%-SFUNWIZ_defines_Changes_END --- EDIT HERE TO _BEGIN */
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 #include "simstruc.h"
 
+
 extern void sfcn_micros_Start_wrapper(real_T *xD);
 extern void sfcn_micros_Outputs_wrapper(uint32_T *microseconds,
-  const real_T *xD);
+			const real_T *xD);
 extern void sfcn_micros_Update_wrapper(uint32_T *microseconds,
-  real_T *xD);
-
+			real_T *xD);
 /*====================*
  * S-function methods *
  *====================*/
@@ -88,64 +88,43 @@ extern void sfcn_micros_Update_wrapper(uint32_T *microseconds,
  */
 static void mdlInitializeSizes(SimStruct *S)
 {
-  DECL_AND_INIT_DIMSINFO(outputDimsInfo);
-  ssSetNumSFcnParams(S, NPARAMS);
-  if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
-    return;                            /* Parameter mismatch will be reported by Simulink */
-  }
 
-  ssSetArrayLayoutForCodeGen(S, SS_COLUMN_MAJOR);
-  ssSetOperatingPointCompliance(S, USE_DEFAULT_OPERATING_POINT);
-  ssSetNumContStates(S, NUM_CONT_STATES);
-  ssSetNumDiscStates(S, NUM_DISC_STATES);
-  if (!ssSetNumInputPorts(S, NUM_INPUTS))
-    return;
-  if (!ssSetNumOutputPorts(S, NUM_OUTPUTS))
-    return;
+    DECL_AND_INIT_DIMSINFO(outputDimsInfo);
+    ssSetNumSFcnParams(S, NPARAMS);
+    if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
+        return; /* Parameter mismatch will be reported by Simulink */
+    }
 
-  /* Output Port 0 */
-  ssSetOutputPortWidth(S, 0, OUTPUT_0_NUM_ELEMS);
-  ssSetOutputPortDataType(S, 0, SS_UINT32);
-  ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
-  ssSetNumPWork(S, 0);
-  ssSetNumSampleTimes(S, 1);
-  ssSetNumRWork(S, 0);
-  ssSetNumIWork(S, 0);
-  ssSetNumModes(S, 0);
-  ssSetNumNonsampledZCs(S, 0);
-  ssSetSimulinkVersionGeneratedIn(S, "10.6");
+    ssSetArrayLayoutForCodeGen(S, SS_COLUMN_MAJOR);
 
-  /* Take care when specifying exception free code - see sfuntmpl_doc.c */
-  ssSetOptions(S, (SS_OPTION_EXCEPTION_FREE_CODE |
-                   SS_OPTION_USE_TLC_WITH_ACCELERATOR |
-                   SS_OPTION_WORKS_WITH_CODE_REUSE));
+    ssSetOperatingPointCompliance(S, USE_DEFAULT_OPERATING_POINT);
+
+    ssSetNumContStates(S, NUM_CONT_STATES);
+    ssSetNumDiscStates(S, NUM_DISC_STATES);
+
+
+    if (!ssSetNumInputPorts(S, NUM_INPUTS)) return;
+
+    if (!ssSetNumOutputPorts(S, NUM_OUTPUTS)) return;
+    /* Output Port 0 */
+    ssSetOutputPortWidth(S, 0, OUTPUT_0_WIDTH);
+    ssSetOutputPortDataType(S, 0, SS_UINT32);
+    ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
+    ssSetNumPWork(S, 0);
+
+    ssSetNumSampleTimes(S, 1);
+    ssSetNumRWork(S, 0);
+    ssSetNumIWork(S, 0);
+    ssSetNumModes(S, 0);
+    ssSetNumNonsampledZCs(S, 0);
+
+    ssSetSimulinkVersionGeneratedIn(S, "10.2");
+
+    /* Take care when specifying exception free code - see sfuntmpl_doc.c */
+    ssSetOptions(S, (SS_OPTION_EXCEPTION_FREE_CODE |
+                     SS_OPTION_USE_TLC_WITH_ACCELERATOR |
+                     SS_OPTION_WORKS_WITH_CODE_REUSE));
 }
-
-#if defined(MATLAB_MEX_FILE)
-#define MDL_SET_INPUT_PORT_DIMENSION_INFO
-
-static void mdlSetInputPortDimensionInfo(SimStruct *S,
-  int_T port,
-  const DimsInfo_T *dimsInfo)
-{
-  if (!ssSetInputPortDimensionInfo(S, port, dimsInfo))
-    return;
-}
-
-#endif
-
-#define MDL_SET_OUTPUT_PORT_DIMENSION_INFO
-#if defined(MDL_SET_OUTPUT_PORT_DIMENSION_INFO)
-
-static void mdlSetOutputPortDimensionInfo(SimStruct *S,
-  int_T port,
-  const DimsInfo_T *dimsInfo)
-{
-  if (!ssSetOutputPortDimensionInfo(S, port, dimsInfo))
-    return;
-}
-
-#endif
 
 /* Function: mdlInitializeSampleTimes =========================================
  * Abstract:
@@ -153,40 +132,36 @@ static void mdlSetOutputPortDimensionInfo(SimStruct *S,
  */
 static void mdlInitializeSampleTimes(SimStruct *S)
 {
-  ssSetSampleTime(S, 0, SAMPLE_TIME_0);
-  ssSetModelReferenceSampleTimeDefaultInheritance(S);
-  ssSetOffsetTime(S, 0, 0.0);
+    ssSetSampleTime(S, 0, SAMPLE_TIME_0);
+    ssSetModelReferenceSampleTimeDefaultInheritance(S);
+    ssSetOffsetTime(S, 0, 0.0);
 }
-
 #define MDL_INITIALIZE_CONDITIONS
-
 /* Function: mdlInitializeConditions ========================================
  * Abstract:
  *    Initialize the states
  */
 static void mdlInitializeConditions(SimStruct *S)
 {
-  real_T *xD = ssGetRealDiscStates(S);
-  xD[0] = 0;
+    real_T *xD = ssGetRealDiscStates(S);
+
+    xD[0] = 0;
 }
 
 #define MDL_SET_OUTPUT_PORT_DATA_TYPE
-
 static void mdlSetOutputPortDataType(SimStruct *S, int port, DTypeId dType)
 {
-  ssSetOutputPortDataType(S, 0, dType);
+    ssSetOutputPortDataType(S, 0, dType);
 }
 
 #define MDL_SET_DEFAULT_PORT_DATA_TYPES
-
 static void mdlSetDefaultPortDataTypes(SimStruct *S)
 {
-  ssSetOutputPortDataType(S, 0, SS_DOUBLE);
+    ssSetOutputPortDataType(S, 0, SS_DOUBLE);
 }
 
-#define MDL_START                                                /* Change to #undef to remove function */
+#define MDL_START  /* Change to #undef to remove function */
 #if defined(MDL_START)
-
 /* Function: mdlStart =======================================================
  * Abstract:
  *    This function is called once at start of model execution. If you
@@ -195,25 +170,26 @@ static void mdlSetDefaultPortDataTypes(SimStruct *S)
  */
 static void mdlStart(SimStruct *S)
 {
-  real_T *xD = ssGetDiscStates(S);
-  sfcn_micros_Start_wrapper(xD);
-}
+    real_T *xD = ssGetDiscStates(S);
 
-#endif                                 /*  MDL_START */
+    sfcn_micros_Start_wrapper(xD);
+}
+#endif /*  MDL_START */
 
 /* Function: mdlOutputs =======================================================
  *
  */
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
-  uint32_T *microseconds = (uint32_T *) ssGetOutputPortRealSignal(S, 0);
-  const real_T *xD = ssGetDiscStates(S);
-  sfcn_micros_Outputs_wrapper(microseconds, xD);
+    uint32_T *microseconds = (uint32_T *) ssGetOutputPortRealSignal(S, 0);
+    const real_T *xD = ssGetDiscStates(S);
+
+    sfcn_micros_Outputs_wrapper(microseconds, xD);
+
 }
 
-#define MDL_UPDATE                                               /* Change to #undef to remove function */
+#define MDL_UPDATE  /* Change to #undef to remove function */
 #if defined(MDL_UPDATE)
-
 /* Function: mdlUpdate ======================================================
  * Abstract:
  *    This function is called once for every major integration time step.
@@ -223,13 +199,13 @@ static void mdlOutputs(SimStruct *S, int_T tid)
  */
 static void mdlUpdate(SimStruct *S, int_T tid)
 {
-  uint32_T *microseconds = (uint32_T *) ssGetOutputPortRealSignal(S, 0);
-  real_T *xD = ssGetDiscStates(S);
-  sfcn_micros_Update_wrapper(microseconds, xD);
+    uint32_T *microseconds = (uint32_T *) ssGetOutputPortRealSignal(S, 0);
+    real_T *xD = ssGetDiscStates(S);
+
+    sfcn_micros_Update_wrapper(microseconds, xD);
+
 }
-
-#endif                                 /* MDL_UPDATE */
-
+#endif /* MDL_UPDATE */
 /* Function: mdlTerminate =====================================================
  * Abstract:
  *    In this function, you should perform any actions that are necessary
@@ -238,10 +214,15 @@ static void mdlUpdate(SimStruct *S, int_T tid)
  */
 static void mdlTerminate(SimStruct *S)
 {
+
 }
 
-#ifdef MATLAB_MEX_FILE                 /* Is this file being compiled as a MEX-file? */
-#include "simulink.c"                  /* MEX-file interface mechanism */
+
+#ifdef  MATLAB_MEX_FILE    /* Is this file being compiled as a MEX-file? */
+#include "simulink.c"      /* MEX-file interface mechanism */
 #else
-#include "cg_sfun.h"                   /* Code generation registration function */
+#include "cg_sfun.h"       /* Code generation registration function */
 #endif
+
+
+

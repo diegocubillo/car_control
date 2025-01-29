@@ -1,10 +1,14 @@
-clear rpi;
-rpi = raspberrypi(CAR_IP, 'pi', 'LabControl');
+stopModel(rpi,'CAR_CONTROL_SYSTEM')
+while isModelRunning(rpi,'CAR_CONTROL_SYSTEM')
+end
 getFile(rpi,'/home/pi/SCOPE_PC.mat')
 % getFile(rpi,'/home/pi/SCOPE_HW.mat')
+getFile(rpi,'/home/pi/SCOPE_COMP_FV.mat')
+% getFile(rpi,'/home/pi/CPU_LOAD.mat')
 % Load .mat files
 load SCOPE_PC.mat
 % load SCOPE_HW.mat
+load SCOPE_COMP_FV.mat
 % Transform to structs
 %------------------------------------------------------------------
 % SCOPE_PC
@@ -34,6 +38,7 @@ STRUCT_PC.signals(11).values = SCOPE_PC(31,:)';
 STRUCT_PC.signals(12).title = 'PITCH ANGLE (deg)';
 STRUCT_PC.signals(12).values = SCOPE_PC(32:33,:)';
 SCOPE_PC = STRUCT_PC;
+save SCOPE_PC SCOPE_PC
 %------------------------------------------------------------------
 % % SCOPE_HW
 % STRUCT_HW = struct('time',SCOPE_HW(1,:)');
@@ -62,4 +67,16 @@ SCOPE_PC = STRUCT_PC;
 % STRUCT_HW.signals(12).title = 'ENCODER MOTOR RATES (rad/s)';
 % STRUCT_HW.signals(12).values = SCOPE_HW(59:66,:)';
 % SCOPE_HW = STRUCT_HW;
+% save SCOPE_HW SCOPE_HW
+%------------------------------------------------------------------
+% SCOPE_COMP_FV
+STRUCT_COMP_FV = struct('time',SCOPE_COMP_FV(1,:)');
+STRUCT_COMP_FV.signals(1).title = 'FORWARD VELOCITY (m/s)';
+STRUCT_COMP_FV.signals(1).values = SCOPE_COMP_FV(2:3,:)';
+STRUCT_COMP_FV.signals(2).title = 'MOTOR VOLTAGE (V)';
+STRUCT_COMP_FV.signals(2).values = SCOPE_COMP_FV(4,:)';
+STRUCT_COMP_FV.signals(3).title = 'IAE';
+STRUCT_COMP_FV.signals(3).values = SCOPE_COMP_FV(5,:)';
+SCOPE_COMP_FV = STRUCT_COMP_FV;
+save SCOPE_COMP_FV SCOPE_COMP_FV
 %------------------------------------------------------------------

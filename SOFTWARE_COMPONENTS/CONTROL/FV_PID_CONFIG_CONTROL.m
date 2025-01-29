@@ -28,22 +28,11 @@ CONTROL.STATE.YAW_ANG_CONTROL_TYPE = uint8(0);
 %--------------------------------------------------------------
 % WALL FOLLOWER CONTROL TYPE
 % / 0. SINGLE LOOP  / 1. CASCADE / 2. STATE FEEDBACK CONTROL         
-CONTROL.STATE.WFL_CONTROL_TYPE = uint8(1);
+CONTROL.STATE.WFL_CONTROL_TYPE = uint8(2);
 %--------------------------------------------------------------
 % PITCH ANGLE CONTROL TYPE
 % / 0. PID  / 1. STATE FEEDBACK REGULATOR / 2. STATE FEEDBACK INTEGRAL CONTROL     
 CONTROL.STATE.PITCH_ANG_CONTROL_TYPE = uint8(1);
-%--------------------------------------------------------------
-% NAVIGATION CONTROL TYPE
-% / 0. ADAPTIVE LQR  / 1. NON-LINEAR MPC     
-CONTROL.STATE.NAV_CONTROL_TYPE = uint8(0);
-%--------------------------------------------------------------
-% NAVIGATION IN CAR MODE (STATE FEEDBACK CONTROL IN FORWARD VELOCITY AND YAW RATE)
-if (CONTROL.STATE.CONTROL_MODE==3 || CONTROL.STATE.CONTROL_MODE==6) && ...
-                    MODEL.PARAM.VEHICLE_MODE==0
-    CONTROL.STATE.FORWARD_VEL_CONTROL_TYPE = uint8(1);  
-    CONTROL.STATE.YAW_RATE_CONTROL_TYPE = uint8(1);    
-end
 
 %--------------------------------------------------------------
 %% CONTROL LIMITS
@@ -141,7 +130,7 @@ CONTROL.PARAM.WFL_RC_SWITCH = [0   0.25  0.5
 %--------------------------------------------------------------
 % Only for FORWARD VELOCITY and YAW RATE
 % / 0. FREQUENCY RESPONSE  / 1. TIME RESPONSE       
-CONTROL.PARAM.PID_DESIGN_METHOD = uint8(0);
+CONTROL.PARAM.PID_DESIGN_METHOD = uint8(1);
 %--------------------------------------------------------------
 % FREQUENCY RESPONSE DESIGN MODEL:
 % / 0. ANALOG MODEL / 1. ANALOG MODIFIED MODEL
@@ -150,6 +139,7 @@ CONTROL.PARAM.PID_FR_DESIGN_MODEL = 0;
 % DISCRETIZATION METHOD (only for forward velocity PID): 
 %  / 1. BACKWARD EULER  / 2. FORWARD EULER  / 3. TRAPEZOIDAL
 CONTROL.PARAM.PID_FV_DISC_METHOD = 3;
+
 %-------------------------------------------------------------
 %% FEEDFORWARD (MOTOR VOLTAGE DROP IN DIFFERENTIAL MODE)
 %-------------------------------------------------------------
@@ -183,7 +173,7 @@ CONTROL.STATE.OBSERVER_MODE = uint8(0);
 %--------------------------------------------------------------
 % ROTATION MEASUREMENT MODE (only for filtered measurement)
 % / 0. IMU / 1. ENCODER
-CONTROL.STATE.ROTATION_MSRT_MODE = uint8(1);
+CONTROL.STATE.ROTATION_MSRT_MODE = uint8(0);
 %--------------------------------------------------------------
 % NAVIGATION MODE
 % / 0. NOT AVAILABE / 1. MCS / 2. LIDAR / 3. ArUco / 4. CHECKERBOARD
@@ -357,7 +347,7 @@ CONTROL.PARAM.ENC_YAW_RATE_matR = [88.9832/2 1682.83/2];
 FORWARD_VEL_OP = [0.2 0.3 0.4 0.5];
 %--------------------------------------------------------------
 % OPERATING POINT FOR CONTROL DESIGN (1-4)
-CONTROL.STATE.FORWARD_VEL_MAIN_OP = uint8(1);
+CONTROL.STATE.FORWARD_VEL_MAIN_OP = uint8(2);
 %--------------------------------------------------------------
 % OPERATING POINT AND MODEL LINEARIZATION 
 % COMPUTATION OF OPERATING POINTS AND LINEAR MODELS
@@ -663,7 +653,7 @@ end
 % / 1. Control P          /  2. Control PI 
 % / 3. Control PD error   /  4. Control PD output
 % / 5. Control PID error  /  6. Control PID output
-FWD_VEL_PID.control_type = 2;
+FWD_VEL_PID.control_type = 6;
 if CONTROL.PARAM.PID_DESIGN_METHOD == 0 % Frequency response
     % Phase margin (deg)
     FWD_VEL_PID.phase_margin_deg = 80;
@@ -679,9 +669,9 @@ if CONTROL.PARAM.PID_DESIGN_METHOD == 0 % Frequency response
     FWD_VEL_PID.f = 0.1;
 else % Time response
     % Damping factor
-    FWD_VEL_PID.damping_factor = 0.7;
+    FWD_VEL_PID.damping_factor = 0.8;
     % Design frequency (rad/s): k = w_d/w_d_P
-    FWD_VEL_PID.k_wd_P = 0.9;
+    FWD_VEL_PID.k_wd_P = 1.4;
     % Reference weight
     FWD_VEL_PID.b = 1;
     % delta = wn*Ti between 1 and 5. Faster and more noisy for 1
@@ -1612,7 +1602,7 @@ end
 %--------------------------------------------------------------
 % Design method
 % 1. Pole placement / 2. LQR
-VEL_SFC.design_method = [2 1];
+VEL_SFC.design_method = [1 1];
 if CONTROL.STATE.OBSERVER_MODE == 1 % EKF
     % Damping factor
     VEL_SFC.damping_factor = [0.6 0.7];
@@ -1626,7 +1616,7 @@ if CONTROL.STATE.OBSERVER_MODE == 1 % EKF
     VEL_SFC.forward_vel_matQ = [12 6 0.85 1];
     VEL_SFC.yaw_rate_matQ = [0.1 1];
     % LQR MV weighting matrix
-    VEL_SFC.forward_vel_matR = 10;
+    VEL_SFC.forward_vel_matR = 2.5;
     VEL_SFC.yaw_rate_matR = 0.1;
 else % Complementary vector
     % Damping factor
@@ -1715,7 +1705,6 @@ if CONTROL.STATE.VEHICLE_MODE == 1
         LIN_MODEL(nn).YAW_RATE_SFC = SFC_OUT;
     end
 end
-
 %-------------------------------------------------------------
 %% YAW ANGLE: STATE FEEDBACK CONTROL
 %-------------------------------------------------------------
@@ -1778,7 +1767,7 @@ end
 % WALL FOLLOWER SFR: SPECIFICATIONS                     
 % Design method
 % 1. Pole placement / 2. LQR
-WFL_SFC.design_method = 2;
+WFL_SFC.design_method = 1;
 % Closed-loop wn / Open-loop wn 
 WFL_SFC.natural_freq = [10 5 5 5];
 % Damping factor
@@ -1786,9 +1775,9 @@ WFL_SFC.damping_factor = [0.99 0.99 0.99 0.99];
 % Third pole module / closed-loop wn 
 WFL_SFC.p_factor = [5 5 5 5];
 % LQR state weighting matrix
-WFL_SFC.matQ = [0 0 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1];
+WFL_SFC.matQ = [5e-4 5e-4 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1];
 % LQR MV weighting matrix
-WFL_SFC.matR = [0.5 ; 0.5e-3 ; 0.5e-3 ; 0.5e-3];
+WFL_SFC.matR = [0.5e-3 ; 0.5e-3 ; 0.5e-3 ; 0.5e-3];
 %--------------------------------------------------------------
 % WALL FOLLOWER SFR: INITIALIZATION
 N = length(LIN_MODEL);
@@ -2164,7 +2153,6 @@ CONTROL.OUTPUT.LEDS = zeros(3,1,'uint8');
 % BUTTONS
 CONTROL.STATE.BUTTONS = zeros(3,1,'uint8');
 CONTROL.STATE.PC_BUTTONS = zeros(3,1,'uint8');
-CONTROL.STATE.NAV_BUTTONS = zeros(3,1,'uint8');
 % MOTOR STATUS
 CONTROL.STATE.MOTOR_STATUS = uint8(0);
 %--------------------------------------------------------------

@@ -7,7 +7,7 @@ function [CONTROL,LIN_MODEL] = CONFIG_CONTROL(MODEL)
 % / 4. WALL FOLLOWER / 5. WALL FOLLOWING COMPETITION /
 % / 6. NAVIGATION COMPETITION / 7. FORWARD VELOCITY COMPETITION /
 % / 8. SELF-BALANCE
-CONTROL.STATE.CONTROL_MODE = uint8(2);
+CONTROL.STATE.CONTROL_MODE = uint8(4);
 
 %------------------------------------------------------------------------
 %% CONTROL TYPES
@@ -15,7 +15,7 @@ CONTROL.STATE.CONTROL_MODE = uint8(2);
 % FORWARD VELOCITY CONTROL TYPE
 % / 0. PID  / 1. STATE FEEDBACK CONTROL / 2, FIRST_ORDER DEAD BEAT 
 % / 3. SECOND-ORDER DEAD BEAT        
-CONTROL.STATE.FORWARD_VEL_CONTROL_TYPE = uint8(0);
+CONTROL.STATE.FORWARD_VEL_CONTROL_TYPE = uint8(1);
 %--------------------------------------------------------------
 % YAW RATE CONTROL TYPE
 % / 0. PID  / 1. STATE FEEDBACK CONTROL / 2, FIRST_ORDER DEAD BEAT 
@@ -28,22 +28,11 @@ CONTROL.STATE.YAW_ANG_CONTROL_TYPE = uint8(0);
 %--------------------------------------------------------------
 % WALL FOLLOWER CONTROL TYPE
 % / 0. SINGLE LOOP  / 1. CASCADE / 2. STATE FEEDBACK CONTROL         
-CONTROL.STATE.WFL_CONTROL_TYPE = uint8(1);
+CONTROL.STATE.WFL_CONTROL_TYPE = uint8(2);
 %--------------------------------------------------------------
 % PITCH ANGLE CONTROL TYPE
 % / 0. PID  / 1. STATE FEEDBACK REGULATOR / 2. STATE FEEDBACK INTEGRAL CONTROL     
 CONTROL.STATE.PITCH_ANG_CONTROL_TYPE = uint8(1);
-%--------------------------------------------------------------
-% NAVIGATION CONTROL TYPE
-% / 0. ADAPTIVE LQR  / 1. NON-LINEAR MPC     
-CONTROL.STATE.NAV_CONTROL_TYPE = uint8(0);
-%--------------------------------------------------------------
-% NAVIGATION IN CAR MODE (STATE FEEDBACK CONTROL IN FORWARD VELOCITY AND YAW RATE)
-if (CONTROL.STATE.CONTROL_MODE==3 || CONTROL.STATE.CONTROL_MODE==6) && ...
-                    MODEL.PARAM.VEHICLE_MODE==0
-    CONTROL.STATE.FORWARD_VEL_CONTROL_TYPE = uint8(1);  
-    CONTROL.STATE.YAW_RATE_CONTROL_TYPE = uint8(1);    
-end
 
 %--------------------------------------------------------------
 %% CONTROL LIMITS
@@ -65,7 +54,7 @@ CONTROL.PARAM.NAV_MV_MIN = [  0  -180*pi/180]';
 %--------------------------------------------------------------
 % FORWARD VELOCITY REFERENCE TYPE
 % / 0. CONSTANT / 1. PULSE / 2. SQUARE / 3. PRBS / 4. RAMP
-CONTROL.STATE.FV_TARGET_TYPE = uint8(2);
+CONTROL.STATE.FV_TARGET_TYPE = uint8(0);
 %--------------------------------------------------------------
 % YAW RATE REFERENCE TYPE
 % / 0. NONE / 1. PULSE / 2. SQUARE / 3. PRBS
@@ -80,7 +69,7 @@ CONTROL.STATE.YA_TARGET_TYPE = uint8(0);
 CONTROL.STATE.WD_TARGET_TYPE = uint8(0);
 %--------------------------------------------------------------
 % FORWARD VELOCITY CONSTANT REFERENCE VALUE (0-4)
-CONTROL.STATE.FV_TARGET_VALUE = uint8(1);
+CONTROL.STATE.FV_TARGET_VALUE = uint8(3);
 %--------------------------------------------------------------
 % INITIAL PITCH ANGLE FOR SELF-BALANCING VEHICLE (rad) -> (pitch(0) = 11 deg)
 CONTROL.STATE.PA_INITIAL_VALUE = 5*pi/180;
@@ -141,7 +130,7 @@ CONTROL.PARAM.WFL_RC_SWITCH = [0   0.25  0.5
 %--------------------------------------------------------------
 % Only for FORWARD VELOCITY and YAW RATE
 % / 0. FREQUENCY RESPONSE  / 1. TIME RESPONSE       
-CONTROL.PARAM.PID_DESIGN_METHOD = uint8(0);
+CONTROL.PARAM.PID_DESIGN_METHOD = uint8(1);
 %--------------------------------------------------------------
 % FREQUENCY RESPONSE DESIGN MODEL:
 % / 0. ANALOG MODEL / 1. ANALOG MODIFIED MODEL
@@ -150,6 +139,7 @@ CONTROL.PARAM.PID_FR_DESIGN_MODEL = 0;
 % DISCRETIZATION METHOD (only for forward velocity PID): 
 %  / 1. BACKWARD EULER  / 2. FORWARD EULER  / 3. TRAPEZOIDAL
 CONTROL.PARAM.PID_FV_DISC_METHOD = 3;
+
 %-------------------------------------------------------------
 %% FEEDFORWARD (MOTOR VOLTAGE DROP IN DIFFERENTIAL MODE)
 %-------------------------------------------------------------
@@ -179,11 +169,11 @@ CONTROL.PARAM.MOTOR_DELAY_ERR = 0;
 %-------------------------------------------------------------
 % OBSERVER MODE
 % / 0. FILTERED MEASUREMENT / 1. EKF 
-CONTROL.STATE.OBSERVER_MODE = uint8(0);
+CONTROL.STATE.OBSERVER_MODE = uint8(1);
 %--------------------------------------------------------------
 % ROTATION MEASUREMENT MODE (only for filtered measurement)
 % / 0. IMU / 1. ENCODER
-CONTROL.STATE.ROTATION_MSRT_MODE = uint8(1);
+CONTROL.STATE.ROTATION_MSRT_MODE = uint8(0);
 %--------------------------------------------------------------
 % NAVIGATION MODE
 % / 0. NOT AVAILABE / 1. MCS / 2. LIDAR / 3. ArUco / 4. CHECKERBOARD
@@ -357,7 +347,7 @@ CONTROL.PARAM.ENC_YAW_RATE_matR = [88.9832/2 1682.83/2];
 FORWARD_VEL_OP = [0.2 0.3 0.4 0.5];
 %--------------------------------------------------------------
 % OPERATING POINT FOR CONTROL DESIGN (1-4)
-CONTROL.STATE.FORWARD_VEL_MAIN_OP = uint8(1);
+CONTROL.STATE.FORWARD_VEL_MAIN_OP = uint8(3);
 %--------------------------------------------------------------
 % OPERATING POINT AND MODEL LINEARIZATION 
 % COMPUTATION OF OPERATING POINTS AND LINEAR MODELS
@@ -1715,7 +1705,6 @@ if CONTROL.STATE.VEHICLE_MODE == 1
         LIN_MODEL(nn).YAW_RATE_SFC = SFC_OUT;
     end
 end
-
 %-------------------------------------------------------------
 %% YAW ANGLE: STATE FEEDBACK CONTROL
 %-------------------------------------------------------------
@@ -2164,7 +2153,6 @@ CONTROL.OUTPUT.LEDS = zeros(3,1,'uint8');
 % BUTTONS
 CONTROL.STATE.BUTTONS = zeros(3,1,'uint8');
 CONTROL.STATE.PC_BUTTONS = zeros(3,1,'uint8');
-CONTROL.STATE.NAV_BUTTONS = zeros(3,1,'uint8');
 % MOTOR STATUS
 CONTROL.STATE.MOTOR_STATUS = uint8(0);
 %--------------------------------------------------------------
