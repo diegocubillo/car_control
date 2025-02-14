@@ -1,10 +1,16 @@
-clear rpi;
-rpi = raspberrypi(CAR_IP, 'pi', 'LabControl');
+stopModel(rpi,'CAR_CONTROL_SYSTEM')
+while isModelRunning(rpi,'CAR_CONTROL_SYSTEM')
+end
 getFile(rpi,'/home/pi/SCOPE_PC.mat')
 % getFile(rpi,'/home/pi/SCOPE_HW.mat')
+getFile(rpi,'/home/pi/SCOPE_COMP_FV.mat')
+% getFile(rpi,'/home/pi/CPU_LOAD.mat')
+getFile(rpi,'/home/pi/SCOPE_NAV.mat')
 % Load .mat files
 load SCOPE_PC.mat
 % load SCOPE_HW.mat
+load SCOPE_COMP_FV.mat
+load SCOPE_NAV.mat
 % Transform to structs
 %------------------------------------------------------------------
 % SCOPE_PC
@@ -34,6 +40,7 @@ STRUCT_PC.signals(11).values = SCOPE_PC(31,:)';
 STRUCT_PC.signals(12).title = 'PITCH ANGLE (deg)';
 STRUCT_PC.signals(12).values = SCOPE_PC(32:33,:)';
 SCOPE_PC = STRUCT_PC;
+save SCOPE_PC SCOPE_PC
 %------------------------------------------------------------------
 % % SCOPE_HW
 % STRUCT_HW = struct('time',SCOPE_HW(1,:)');
@@ -62,4 +69,46 @@ SCOPE_PC = STRUCT_PC;
 % STRUCT_HW.signals(12).title = 'ENCODER MOTOR RATES (rad/s)';
 % STRUCT_HW.signals(12).values = SCOPE_HW(59:66,:)';
 % SCOPE_HW = STRUCT_HW;
+% save SCOPE_HW SCOPE_HW
 %------------------------------------------------------------------
+% SCOPE_COMP_FV
+STRUCT_COMP_FV = struct('time',SCOPE_COMP_FV(1,:)');
+STRUCT_COMP_FV.signals(1).title = 'FORWARD VELOCITY (m/s)';
+STRUCT_COMP_FV.signals(1).values = SCOPE_COMP_FV(2:3,:)';
+STRUCT_COMP_FV.signals(2).title = 'MOTOR VOLTAGE (V)';
+STRUCT_COMP_FV.signals(2).values = SCOPE_COMP_FV(4,:)';
+STRUCT_COMP_FV.signals(3).title = 'IAE';
+STRUCT_COMP_FV.signals(3).values = SCOPE_COMP_FV(5,:)';
+SCOPE_COMP_FV = STRUCT_COMP_FV;
+save SCOPE_COMP_FV SCOPE_COMP_FV
+%------------------------------------------------------------------
+% SCOPE_NAV
+STRUCT_NAV = struct('time',SCOPE_NAV(1,:)');
+STRUCT_NAV.signals(1).title = 'POSITION (m)';
+STRUCT_NAV.signals(1).values = SCOPE_NAV(2:5,:)';
+STRUCT_NAV.signals(2).title = 'VELOCITY (m/s)';
+STRUCT_NAV.signals(2).values = SCOPE_NAV(6:9,:)';
+STRUCT_NAV.signals(3).title = 'VELOCITY MAGNITUDE (m/s)';
+STRUCT_NAV.signals(3).values = SCOPE_NAV(10:11,:)';
+STRUCT_NAV.signals(4).title = 'VELOCITY ANGLE (deg)';
+STRUCT_NAV.signals(4).values = SCOPE_NAV(12:13,:)';
+STRUCT_NAV.signals(5).title = 'MOTOR VOLTAGE (V)';
+STRUCT_NAV.signals(5).values = SCOPE_NAV(14:15,:)';
+STRUCT_NAV.signals(6).title = 'MOTOR VOLTAGE (V)';
+STRUCT_NAV.signals(6).values = SCOPE_NAV(16:17,:)';
+% 1.1 - POSITION X REF (m)
+% 1.2 - POSITION Y REF (m)
+% 1.3 - POSITION X CONTROL (m)
+% 1.4 - POSITION Y CONTROL (m)
+% 2.1 - VELOCITY X REF (m/s)
+% 2.2 - VELOCITY Y REF (m/s)
+% 2.3 - VELOCITY X CONTROL (m/s)
+% 2.4 - VELOCITY Y CONTROL (m/s)
+% 3.1 - VELOCITY MAGNITUDE REF (m/s)
+% 3.2 - VELOCITY MAGNITUDE CONTROL (m/s)
+% 4.1 - VELOCITY ANGLE REF (deg)
+% 4.2 - VELOCITY ANGLE CONTROL (deg)
+% 5.1 - COM MOTOR VOLT (V)
+% 5.2 - DIF ROTOR VOLTAGE (V)
+% 6.1 - LEFT MOTOR VOLT (V)
+% 6.2 - RIGHT ROTOR VOLTAGE (V)

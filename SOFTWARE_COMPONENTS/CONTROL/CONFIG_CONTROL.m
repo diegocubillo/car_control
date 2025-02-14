@@ -446,7 +446,8 @@ CONTROL.PARAM.FV_PI_STR_b = 1;
 %--------------------------------------------------------------
 % COMMUNICATIONS MODE
 % / 0. NOT ENABLED / 1. ENABLED / 2. BLACKBOX (local monitoring)
-CONTROL.STATE.COMM_MODE = uint8(0);
+% / 3. MATLAB
+CONTROL.STATE.COMM_MODE = uint8(3);
 %--------------------------------------------------------------
 % COMMUNICATION SAMPLING TIME
 CONTROL.PARAM.COMM_SAMPLING_TIME =  1*MODEL.PARAM.SAMPLING_TIME;

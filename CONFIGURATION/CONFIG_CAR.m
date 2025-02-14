@@ -358,8 +358,8 @@ switch RUN_MODE
         cd('../SIMULINK');
         % bdclose(MODEL_SLX);
         open(PC_SLX);
-        set_param([PC_SLX '/HARDWARE/RT_MONITORING'],'Commented','off');
-        set_param([PC_SLX '/HARDWARE/ROS2_MONITORING'],'Commented','on');
+        % set_param([PC_SLX '/HARDWARE/RT_MONITORING'],'Commented','off');
+        % set_param([PC_SLX '/HARDWARE/ROS2_MONITORING'],'Commented','on');
         for ii = 1:21
             set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP ' num2str(100+ii)],'Commented','on');
         end
@@ -410,10 +410,10 @@ switch RUN_MODE
         end
         % Communications mode
         % CONTROL_INI.STATE.COMM_MODE = uint8(1);
-        cd('../SIMULINK');
-        open(PC_SLX);
-        set_param([PC_SLX '/HARDWARE/RT_MONITORING'],'Commented','on');
-        set_param([PC_SLX '/HARDWARE/ROS2_MONITORING'],'Commented','off');
+        % cd('../SIMULINK');
+        % open(PC_SLX);
+        % set_param([PC_SLX '/HARDWARE/RT_MONITORING'],'Commented','on');
+        % set_param([PC_SLX '/HARDWARE/ROS2_MONITORING'],'Commented','off');
     otherwise
 end
 
@@ -520,3 +520,8 @@ end
 
 clear MODEL_SLX
 
+if (RUN_MODE==4 || RUN_MODE==5) && CONTROL_INI.STATE.COMM_MODE==3
+    cd('../CONFIGURATION');
+    SEND_CONTROL_BUS
+    cd('../SIMULINK');
+end
