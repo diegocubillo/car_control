@@ -3,7 +3,7 @@
 %--------------------------------------------------------------
 % IP for SSH and TCP/IP communications
 % CAR_IP = '127.0.0.1';
-CAR_IP = '192.168.0.74';
+CAR_IP = '10.42.0.246';
 % CAR_IP = '10.42.0.19';
 % RUN_MODE DEFINITION
 % / 0. REAL-TIME SIMULATION / 1. FAST SIMULATION / 2. TEST VERIFICATION 
@@ -373,33 +373,38 @@ switch RUN_MODE
     case 5 % GAZEBO SIMULATION
     %-------------------------------------
 
+        clear rpi
+        rpi = raspberrypi(CAR_IP,'pi','LabControl');
+        try
+            rpi.stopModel(MODEL_SLX);
+            rpi.system('rm -rf \MATLAB_ws/R2023b/CAR_CONTROL*')
+            rpi.system('rm -rf \MATLAB_ws/R2023b/D')
+            rpi.system('rm -rf \MATLAB_ws/R2023b/C')
+            rpi.system('rm -rf \MATLAB_ws/R2023b/Users')
+            aux = datestr(now,'mm dd yyyy HH:MM:SS');
+            rpi.system(['sudo date -s "' aux(7:10) '-' aux(1:2) '-' aux(4:5) ' ' aux(12:end) '"'])
+        catch
+            disp('CONNECTION / REMOVE FAILED')
+        end
         set_param(MODEL_SLX,'FixedStep','1e-3');
         set_param(MODEL_SLX,'StopTime','inf');
         set_param([MODEL_SLX '/CONTROL'],'Commented','off');
         set_param([MODEL_SLX '/CONTROL/LOCAL TARGETS'],'Commented','off');
         set_param([MODEL_SLX '/HARDWARE'],'Commented','on');
         set_param([MODEL_SLX '/SIMULATION'],'Commented','off');
-        set_param([MODEL_SLX '/Microseconds at Start'],'Commented','on');
-        set_param([MODEL_SLX '/Microseconds at End'],'Commented','on');
-        set_param([MODEL_SLX '/COMPUTATIONAL LOAD'],'Commented','on');
+        set_param([MODEL_SLX '/Microseconds at Start'],'Commented','off');
+        set_param([MODEL_SLX '/Microseconds at End'],'Commented','off');
+        set_param([MODEL_SLX '/COMPUTATIONAL LOAD'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/TEST: SCOPES'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/HARDWARE: SCOPES'],'Commented','on');
         set_param([MODEL_SLX '/MONITORING/COMMUNICATIONS'],'Commented','off');
         set_param([MODEL_SLX '/MONITORING/EXTERNAL MODE: SCOPES'],'Commented','on');
-        set_param([MODEL_SLX '/MONITORING/BLACKBOX'],'Commented','on');
+        set_param([MODEL_SLX '/MONITORING/BLACKBOX'],'Commented','off');
         set_param([MODEL_SLX '/GAZEBO SIMULATION'],'Commented','off');
         set_param([MODEL_SLX '/SIMULATION'],'Commented','on');
         set_param(MODEL_SLX,'SimulationMode','External');
-        set_param(MODEL_SLX,'HardwareBoard','Robot Operating System 2 (ROS 2)');
-        set_param(MODEL_SLX,'TargetHWDeviceType','ARM Compatible->ARM 8');
-        set_param(MODEL_SLX,'SupportVariableSizeSignals','on');
-        set_param(MODEL_SLX,'CodeInterfacePackaging','Nonreusable function');
-        set_param(MODEL_SLX,'MATLABDynamicMemAlloc','on');
 
-        CONTROL_INI.STATE.CURRENT_STATUS_SYS = uint8(0);
-        CONTROL_INI.STATE.CURRENT_STATUS_PC = uint8(0);
-        CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 0.5;
         % SYSTEM STATUS
         CONTROL_INI.STATE.CURRENT_STATUS_SYS = uint8(0);
         CONTROL_INI.STATE.CURRENT_STATUS_PC = uint8(0);
@@ -408,12 +413,7 @@ switch RUN_MODE
         else
             CONTROL_INI.PARAM.CONTROL_ACT_DELAY = 0.5;
         end
-        % Communications mode
-        % CONTROL_INI.STATE.COMM_MODE = uint8(1);
-        cd('../SIMULINK');
-        open(PC_SLX);
-        set_param([PC_SLX '/HARDWARE/RT_MONITORING'],'Commented','on');
-        set_param([PC_SLX '/HARDWARE/ROS2_MONITORING'],'Commented','off');
+        
     otherwise
 end
 
