@@ -3,12 +3,12 @@
 %--------------------------------------------------------------
 % IP for SSH and TCP/IP communications
 % CAR_IP = '127.0.0.1';
-CAR_IP = '10.42.0.246';
+CAR_IP = '192.168.2.123';
 % CAR_IP = '10.42.0.19';
 % RUN_MODE DEFINITION
 % / 0. REAL-TIME SIMULATION / 1. FAST SIMULATION / 2. TEST VERIFICATION 
 % / 3. IMPLEMENTATION / 4. ALREADY DEPLOYED / 5. GAZEBO SIMULATION
-RUN_MODE = 5;
+RUN_MODE = 4;
 % TEST FOR MODEL IDENTIFICATION
 IDENT_TEST = false;
 % VEHICLE MODE
@@ -355,20 +355,20 @@ switch RUN_MODE
         end
         % Communications mode
         % CONTROL_INI.STATE.COMM_MODE = uint8(1);
-        cd('../SIMULINK');
+        % cd('../SIMULINK');
         % bdclose(MODEL_SLX);
-        open(PC_SLX);
+        % open(PC_SLX);
         % set_param([PC_SLX '/HARDWARE/RT_MONITORING'],'Commented','off');
         % set_param([PC_SLX '/HARDWARE/ROS2_MONITORING'],'Commented','on');
-        for ii = 1:21
-            set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP ' num2str(100+ii)],'Commented','on');
-        end
-        set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP ' CAR_IP(end-2:end)],'Commented','off');
+        % for ii = 1:21
+        %     set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP ' num2str(100+ii)],'Commented','on');
+        % end
+        % set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP ' CAR_IP(end-2:end)],'Commented','off');
         % set_param([PC_SLX '/HARDWARE/RT_MONITORING/TCP RSP'],'Commented','off');
-        if CONTROL_INI.STATE.CONTROL_MODE == 5 % WALL-FOLLOWER COMPETITION
-            CONTROL_INI.STATE.FV_TARGET_TYPE = uint8(0);
-            CONTROL_INI.STATE.WD_TARGET_TYPE = uint8(0);
-        end
+        % if CONTROL_INI.STATE.CONTROL_MODE == 5 % WALL-FOLLOWER COMPETITION
+        %     CONTROL_INI.STATE.FV_TARGET_TYPE = uint8(0);
+        %     CONTROL_INI.STATE.WD_TARGET_TYPE = uint8(0);
+        % end
     %-------------------------------------
     case 5 % GAZEBO SIMULATION
     %-------------------------------------
@@ -521,7 +521,7 @@ end
 clear MODEL_SLX
 
 
-if (RUN_MODE==4 || RUN_MODE==5) && CONTROL_INI.STATE.COMM_MODE==3
+if (RUN_MODE==4) && CONTROL_INI.STATE.COMM_MODE==3
     cd('../CONFIGURATION');
     SEND_CONTROL_BUS
     cd('../SIMULINK');
