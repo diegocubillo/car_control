@@ -1,3 +1,15 @@
+% clear rpi;
+rpi = raspberrypi(CAR_IP, 'pi', 'LabControl');
+% deleteFile(rpi,'/home/pi/SCOPE_PC.mat')
+stopModel(rpi,'CAR_CONTROL_SYSTEM')
+while isModelRunning(rpi,'CAR_CONTROL_SYSTEM')
+    stopModel(rpi,'CAR_CONTROL_SYSTEM')
+end
+runModel(rpi,'CAR_CONTROL_SYSTEM')
+while isModelRunning(rpi,'CAR_CONTROL_SYSTEM')==false
+    runModel(rpi,'CAR_CONTROL_SYSTEM')
+end
+% clear rpi;
 
 % Initialization of variables
 PC_MSG_BUFFER = uint8(1); % Message buffer index
@@ -7,60 +19,23 @@ MSG_PC = MSG_INI;
 CONTROL_PC = CONTROL_INI;
 COMM_SAMPLING_TIME = CONTROL_PC.PARAM.COMM_SAMPLING_TIME;
 
-if RUN_MODE == 5
-    topics = ros2("topic", "list");
-    target_topic = "/model/kitt/car_to_pc";
-    if any(strcmp(topics, target_topic))
-        disp("Car control system node is active, starting...");
-
-        ros2_node = ros2node('matlab_bus_node');
-        pub = ros2publisher(ros2_node,"model/kitt/pc_to_car","std_msgs/UInt8MultiArray","Reliability","besteffort","Depth",1);
-        sub = ros2subscriber(ros2_node,"model/kitt/car_to_pc","std_msgs/UInt8MultiArray","Reliability","besteffort","Depth",1);
-    else
-        disp("Node is not active, aborting execution.")
-        return
-    end
-else
-    % clear rpi;
-    rpi = raspberrypi(CAR_IP, 'pi', 'LabControl');
-    % deleteFile(rpi,'/home/pi/SCOPE_PC.mat')
-    stopModel(rpi,'CAR_CONTROL_SYSTEM')
-    while isModelRunning(rpi,'CAR_CONTROL_SYSTEM')
-        stopModel(rpi,'CAR_CONTROL_SYSTEM')
-    end
-    runModel(rpi,'CAR_CONTROL_SYSTEM')
-    while isModelRunning(rpi,'CAR_CONTROL_SYSTEM')==false
-        runModel(rpi,'CAR_CONTROL_SYSTEM')
-    end
-    % clear rpi;
-    
-    
-    % Communication setup
-    SEND_PORT = 27001; % Sending port
-    RECEIVE_PORT = 27000; % Receiving port
-    pause(2)
-    tcpSend = tcpclient(CAR_IP, SEND_PORT, 'Timeout', 10);
-    tcpReceive = tcpclient(CAR_IP, RECEIVE_PORT, 'Timeout', 10);
-end
+% Communication setup
+SEND_PORT = 27001; % Sending port
+RECEIVE_PORT = 27000; % Receiving port
+pause(2)
+tcpSend = tcpclient(CAR_IP, SEND_PORT, 'Timeout', 10);
+tcpReceive = tcpclient(CAR_IP, RECEIVE_PORT, 'Timeout', 10);
 
 % Main communication loop
 disp('Starting communication...');
 while true
 
     % Encode the message to send using MSG_CODER
-    MSG_PC.TX_ID = MSG_PC.MSG_ID_LIST(:,PC_MSG_BUFFER);
     MSG_PC = MSG_CODER(MSG_PC,CONTROL_PC); % Encode the MSG structure into TX_BUFFER
 
     % Send the encoded data
     if MSG_PC.TX_BUFFER(1, 1) > 0
-        if RUN_MODE == 5
-            msg = ros2message(pub);
-            msg.data = MSG_PC.TX_BUFFER;
-            send(pub,msg)
-            disp('Ros2 message sent.');
-        else
-            write(tcpSend, MSG_PC.TX_BUFFER, 'uint8');
-        end
+        write(tcpSend, MSG_PC.TX_BUFFER, 'uint8');
         disp(['Message ' num2str(PC_MSG_BUFFER) ' sent to Raspberry Pi.']);
     end
 
@@ -68,20 +43,10 @@ while true
     pause(COMM_SAMPLING_TIME);
 
     % Receive and decode the message
-    if MSG_PC.TX_BUFFER(1, 1) > 0
-        if RUN_MODE == 5
-            try
-                msg2 = receive(sub,0.1);
-                MSG_PC.RX_BUFFER = msg2.data;
-                [MSG_PC, CONTROL_PC] = MSG_DECODER(MSG_PC, CONTROL_PC); % Decode received data into MSG
-                disp(['Message ' num2str(PC_MSG_BUFFER) ' received and processed.']);
-            catch
-            end
-        elseif tcpReceive.NumBytesAvailable > 0
-            MSG_PC.RX_BUFFER = read(tcpReceive, length(MSG_PC.TX_BUFFER), 'uint8')';
-            [MSG_PC, CONTROL_PC] = MSG_DECODER(MSG_PC, CONTROL_PC); % Decode received data into MSG
-            disp(['Message ' num2str(PC_MSG_BUFFER) ' received and processed.']);
-        end
+    if tcpReceive.NumBytesAvailable > 0
+        MSG_PC.RX_BUFFER = read(tcpReceive, length(MSG_PC.TX_BUFFER), 'uint8')';
+        [MSG_PC, CONTROL_PC] = MSG_DECODER(MSG_PC, CONTROL_PC); % Decode received data into MSG
+        disp(['Message ' num2str(PC_MSG_BUFFER) ' received and processed.']);
     end
 
     % Compare TX and RX data
@@ -102,27 +67,11 @@ while true
     ind_end = ind_ini + sum(MSG_LEN_TX(2:end)) - 1;
     DATA_TX = BUFFER_TX(ind_ini:ind_end);
     if PC_MSG_BUFFER <= size(MSG_PC.MSG_ID_LIST, 2)
-        if isequal(DATA_RX, DATA_TX) && ~isempty(DATA_TX)
-            disp('Message matching.')
+        MSG_PC.TX_ID = MSG_PC.MSG_ID_LIST(:,PC_MSG_BUFFER);
+        if isequal(DATA_RX, DATA_TX)
+            PC_MSG_BUFFER = PC_MSG_BUFFER + 1;
             COMM_FAILED = uint8(0);
             nn = 0;
-            if PC_MSG_BUFFER == size(MSG_PC.MSG_ID_LIST, 2)
-                CONTROL_PC.STATE.CURRENT_STATUS_PC = uint8(1); % WAITING FOR RPI SET UP
-                PC_MSG_BUFFER = uint8(1);
-                % Encode the message to send using MSG_CODER
-                MSG_PC.TX_ID = uint8([2 0 0 0 0 0 0 0]');
-                MSG_PC = MSG_CODER(MSG_PC,CONTROL_PC); % Encode the MSG structure into TX_BUFFER
-                if RUN_MODE == 5
-                    msg = ros2message(pub);
-                    msg.data = MSG_PC.TX_BUFFER;
-                    send(pub,msg);
-                else
-                    write(tcpSend, MSG_PC.TX_BUFFER, 'uint8');
-                end
-                disp('All messages sent and confirmed. Communication complete.');
-                break;
-            end
-            PC_MSG_BUFFER = PC_MSG_BUFFER + 1;
         elseif nn >= 400 && (~isequal(DATA_RX,DATA_TX))
             disp('Communication failed. Stopping...');
             COMM_FAILED = uint8(1);
@@ -131,9 +80,18 @@ while true
         else
             nn = nn + 1;
         end
+    else
+        CONTROL_PC.STATE.CURRENT_STATUS_PC = uint8(1); % WAITING FOR RPI SET UP
+        PC_MSG_BUFFER = uint8(1);
+        % Encode the message to send using MSG_CODER
+        MSG_PC.TX_ID = uint8([2 0 0 0 0 0 0 0]');
+        MSG_PC = MSG_CODER(MSG_PC,CONTROL_PC); % Encode the MSG structure into TX_BUFFER
+        write(tcpSend, MSG_PC.TX_BUFFER, 'uint8');
+        disp('All messages sent and confirmed. Communication complete.');
+        break;
     end
 end
 
 % Cleanup
-clear tcpSend tcpReceive pub sub ros2_node;
+clear tcpSend tcpReceive;
 disp('Connections closed. Communication finished.');
