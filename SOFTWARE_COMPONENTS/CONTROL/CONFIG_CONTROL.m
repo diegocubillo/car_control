@@ -28,7 +28,7 @@ CONTROL.STATE.YAW_ANG_CONTROL_TYPE = uint8(0);
 %--------------------------------------------------------------
 % WALL FOLLOWER CONTROL TYPE
 % / 0. SINGLE LOOP  / 1. CASCADE / 2. STATE FEEDBACK CONTROL         
-CONTROL.STATE.WFL_CONTROL_TYPE = uint8(1);
+CONTROL.STATE.WFL_CONTROL_TYPE = uint8(2);
 %--------------------------------------------------------------
 % PITCH ANGLE CONTROL TYPE
 % / 0. PID  / 1. STATE FEEDBACK REGULATOR / 2. STATE FEEDBACK INTEGRAL CONTROL     
@@ -161,7 +161,7 @@ CONTROL.PARAM.NAV_RC_SWITCH = [1  0  -1
 %--------------------------------------------------------------
 % Only for FORWARD VELOCITY and YAW RATE
 % / 0. FREQUENCY RESPONSE  / 1. TIME RESPONSE       
-CONTROL.PARAM.PID_DESIGN_METHOD = uint8(0);
+CONTROL.PARAM.PID_DESIGN_METHOD = uint8(1);
 %--------------------------------------------------------------
 % FREQUENCY RESPONSE DESIGN MODEL:
 % / 0. ANALOG MODEL / 1. ANALOG MODIFIED MODEL
@@ -175,7 +175,7 @@ CONTROL.PARAM.PID_FV_DISC_METHOD = 3;
 %-------------------------------------------------------------
 % VOLTAGE DROP IN DIFFERENTIAL MOTOR VOLTAGE
 % / 0. NOT ENABLED / 1. ENABLED
-CONTROL.STATE.WFL_FEEDFORWARD = uint8(1);
+CONTROL.STATE.WFL_FEEDFORWARD = uint8(0);
 
 %--------------------------------------------------------------
 %% DELAY IN MOTOR VOLTAGE
@@ -199,7 +199,7 @@ CONTROL.PARAM.MOTOR_DELAY_ERR = 0;
 %-------------------------------------------------------------
 % OBSERVER MODE
 % / 0. FILTERED MEASUREMENT / 1. EKF 
-CONTROL.STATE.OBSERVER_MODE = uint8(1);
+CONTROL.STATE.OBSERVER_MODE = uint8(0);
 %--------------------------------------------------------------
 % ROTATION MEASUREMENT MODE (only for filtered measurement)
 % / 0. IMU / 1. ENCODER
@@ -207,7 +207,7 @@ CONTROL.STATE.ROTATION_MSRT_MODE = uint8(1);
 %--------------------------------------------------------------
 % NAVIGATION MODE
 % / 0. NOT AVAILABE / 1. MCS / 2. LIDAR / 3. OTHER
-CONTROL.STATE.NAV_MODE = uint8(3);
+CONTROL.STATE.NAV_MODE = uint8(0);
 % MCS MODE (AVAILABLE FOR COMPARISON)
 % / 0. NOT AVAILABE / 1. AVAILABLE
 CONTROL.STATE.MCS_MODE = uint8(0);
@@ -702,13 +702,13 @@ else % Time response
     % Damping factor
     FWD_VEL_PID.damping_factor = 0.7;
     % Design frequency (rad/s): k = w_d/w_d_P
-    FWD_VEL_PID.k_wd_P = 0.8;
+    FWD_VEL_PID.k_wd_P = 0.9;
     % Reference weight
     FWD_VEL_PID.b = 1;
     % delta = wn*Ti between 1 and 5. Faster and more noisy for 1
     FWD_VEL_PID.delta = 5;
     % Filtering factor of the derivative action
-    FWD_VEL_PID.N = 5;    
+    FWD_VEL_PID.N = 3;
 end
 %--------------------------------------------------------------
 if CONTROL.STATE.VEHICLE_MODE == 0
@@ -1638,18 +1638,18 @@ end
 VEL_SFC.design_method = [1 1];
 if CONTROL.STATE.OBSERVER_MODE == 1 % EKF
     % Damping factor
-    VEL_SFC.damping_factor = [0.6 0.7];
+    VEL_SFC.damping_factor = [0.75 0.7];
     % Natural frequency factor: closed-loop wn / open-loop wn
-    VEL_SFC.wn_factor = [0.85 0.8];
+    VEL_SFC.wn_factor = [0.84 0.8];
     % Third pole module / closed-loop wn (only forward velocity)
-    VEL_SFC.p3_factor = 0.1;
+    VEL_SFC.p3_factor = 0.11;
     % Fourth pole module / closed-loop wn (only forward velocity)
     VEL_SFC.p4_factor = 10;
     % LQR state weighting matrix
     VEL_SFC.forward_vel_matQ = [12 6 0.85 1];
     VEL_SFC.yaw_rate_matQ = [0.1 1];
     % LQR MV weighting matrix
-    VEL_SFC.forward_vel_matR = 2.5;
+    VEL_SFC.forward_vel_matR = 10;
     VEL_SFC.yaw_rate_matR = 0.1;
 else % Complementary filter
     % Damping factor
@@ -1801,7 +1801,7 @@ end
 % WALL FOLLOWER SFR: SPECIFICATIONS                     
 % Design method
 % 1. Pole placement / 2. LQR
-WFL_SFC.design_method = 1;
+WFL_SFC.design_method = 2;
 % Closed-loop wn (rad/s) 
 WFL_SFC.natural_freq = [10 5 5 5];
 % Damping factor
@@ -1809,9 +1809,9 @@ WFL_SFC.damping_factor = [0.99 0.99 0.99 0.99];
 % Third pole module / closed-loop wn 
 WFL_SFC.p_factor = [5 5 5 5];
 % LQR state weighting matrix
-WFL_SFC.matQ = [5e-4 5e-4 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1];
+WFL_SFC.matQ = [0 0 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1];
 % LQR MV weighting matrix
-WFL_SFC.matR = [0.5e-3 ; 0.5e-3 ; 0.5e-3 ; 0.5e-3];
+WFL_SFC.matR = [0.5 ; 0.5e-3 ; 0.5e-3 ; 0.5e-3];
 %--------------------------------------------------------------
 % WALL FOLLOWER SFR: INITIALIZATION
 N = length(LIN_MODEL);

@@ -15,7 +15,7 @@ IDENT_TEST = false;
 % / 0. CAR / 1. SELF-BALANCING VEHICLE
 VEHICLE_MODE = 0;
 % Sampling time (s)
-SAMPLING_TIME = 10e-3;
+SAMPLING_TIME = 5e-3;
 % The sampling time used in the control should be a multiple of the sampling time
 CONTROL_SAMPLING_TIME = 1*SAMPLING_TIME; 
 MCS_SAMPLING_TIME = 1*SAMPLING_TIME; % Not used
@@ -520,7 +520,7 @@ end
 
 clear MODEL_SLX
 
-
+%% BUS SENDING
 if (RUN_MODE==4) && CONTROL_INI.STATE.COMM_MODE==3
     cd('../CONFIGURATION');
     SEND_CONTROL_BUS
