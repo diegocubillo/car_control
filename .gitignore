@@ -4,6 +4,7 @@ TEST_HARDWARE/
 DOCUMENTS/
 NatNetSDK/
 GUI/
+.vscode/
 *.asv
 *src/
 
@@ -21,3 +22,13 @@ GUI/
 *.mexmaci64
 *.mexmaca64
 *SFB__sfcn_micros__SFB.mat
+
+# Archivos generados tras el ensayo
+*CPU_LOAD.mat
+*SCOPE_COMP_FV.mat
+*SCOPE_HW.mat
+*SCOPE_NAV.mat
+*SCOPE_PC.mat
+
+*rtwmakecfg.m
+*sfcn_micros*
