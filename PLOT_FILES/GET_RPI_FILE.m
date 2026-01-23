@@ -1,3 +1,6 @@
+if ~exist('rpi', 'var')
+    rpi = raspberrypi('192.168.2.123', 'pi', 'LabControl');
+end
 stopModel(rpi,'CAR_CONTROL_SYSTEM')
 while isModelRunning(rpi,'CAR_CONTROL_SYSTEM')
 end
