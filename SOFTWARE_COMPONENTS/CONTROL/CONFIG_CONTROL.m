@@ -80,7 +80,7 @@ CONTROL.STATE.YA_TARGET_TYPE = uint8(0);
 CONTROL.STATE.WD_TARGET_TYPE = uint8(0);
 %--------------------------------------------------------------
 % FORWARD VELOCITY CONSTANT REFERENCE VALUE (0-4)
-CONTROL.PARAM.FV_TARGET_VALUE = uint8(1);
+CONTROL.PARAM.FV_TARGET_VALUE = uint8(2);
 %--------------------------------------------------------------
 % INITIAL PITCH ANGLE FOR SELF-BALANCING VEHICLE (rad) -> (pitch(0) = 11 deg)
 CONTROL.PARAM.PA_INITIAL_VALUE = 5*pi/180;
@@ -1635,7 +1635,7 @@ end
 %--------------------------------------------------------------
 % Design method
 % 1. Pole placement / 2. LQR
-VEL_SFC.design_method = [1 1];
+VEL_SFC.design_method = [2 2];
 if CONTROL.STATE.OBSERVER_MODE == 1 % EKF
     % Damping factor
     VEL_SFC.damping_factor = [0.75 0.7];
@@ -1646,10 +1646,10 @@ if CONTROL.STATE.OBSERVER_MODE == 1 % EKF
     % Fourth pole module / closed-loop wn (only forward velocity)
     VEL_SFC.p4_factor = 10;
     % LQR state weighting matrix
-    VEL_SFC.forward_vel_matQ = [12 6 0.85 1];
+    VEL_SFC.forward_vel_matQ = [0 0 0 1];
     VEL_SFC.yaw_rate_matQ = [0.1 1];
     % LQR MV weighting matrix
-    VEL_SFC.forward_vel_matR = 10;
+    VEL_SFC.forward_vel_matR = 0.1; % Original 0.1 Lower limit 0.0004
     VEL_SFC.yaw_rate_matR = 0.1;
 else % Complementary filter
     % Damping factor
@@ -1811,7 +1811,7 @@ WFL_SFC.p_factor = [5 5 5 5];
 % LQR state weighting matrix
 WFL_SFC.matQ = [0 0 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1 ; 5e-4 5e-4 1];
 % LQR MV weighting matrix
-WFL_SFC.matR = [0.5 ; 0.5e-3 ; 0.5e-3 ; 0.5e-3];
+WFL_SFC.matR = [0.5e-3 ; 0.5e-3 ; 0.5e-3 ; 0.5e-3];
 %--------------------------------------------------------------
 % WALL FOLLOWER SFR: INITIALIZATION
 N = length(LIN_MODEL);

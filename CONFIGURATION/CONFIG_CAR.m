@@ -105,7 +105,9 @@ cd ../CONFIGURATION
 cd('../SIMULINK');
 MODEL_SLX = 'CAR_CONTROL_SYSTEM';
 PC_SLX = 'PC_CONTROL_STATION';
-open(MODEL_SLX)
+if RUN_MODE ~= 4
+    open(MODEL_SLX)
+end
 % RUN_MODE 
 switch RUN_MODE
     %-------------------------------------

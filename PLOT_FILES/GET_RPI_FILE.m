@@ -14,7 +14,28 @@ load SCOPE_PC.mat
 load SCOPE_HW.mat
 load SCOPE_COMP_FV.mat
 load SCOPE_NAV.mat
-% Transform to structs
+
+%% Filter signals
+% order = 4;
+% design_freq = 1; % Hz
+% sampling_freq = 200;
+% Wn = design_freq / (sampling_freq / 2); % Nyquist freq is sampling freq / 2
+% [b, a] = butter(order, Wn, 'low');
+% 
+% fv_original = SCOPE_PC(3,:);
+% % yr_original = SCOPE_PC(5,:);
+% % wd_original = SCOPE_PC(9,:);
+% pr_original = SCOPE_PC(31,:);
+% pa_original = SCOPE_PC(33,:);
+% 
+% SCOPE_PC(3,:) = filtfilt(b, a, fv_original);
+% % SCOPE_PC(5,:) = filtfilt(b, a, yr_original);
+% % SCOPE_PC(9,:) = filtfilt(b, a, wd_original);
+% SCOPE_PC(31,:) = filtfilt(b, a, pr_original);
+% SCOPE_PC(33,:) = filtfilt(b, a, pa_original);
+
+
+%% Transform to structs
 %------------------------------------------------------------------
 % SCOPE_PC
 STRUCT_PC = struct('time',SCOPE_PC(1,:)');

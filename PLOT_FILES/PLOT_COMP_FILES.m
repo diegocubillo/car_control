@@ -30,6 +30,8 @@ signals = [
     5 2
     6 1
     6 2
+    11 1
+    12 2
     ];
 
 %--------------------------------------------------------------
@@ -48,14 +50,35 @@ signals = [
 % 5.3 - BATTERY VOLT (V)
 % 6.1 - COM MOTOR VOLT (V)
 % 6.2 - DIF MOTOR VOLT (V)
+% 7.1 - POSITION X REF (m)
+% 7.2 - POSITION Y REF (m)
+% 7.3 - POSITION X CONTROL (m)
+% 7.4 - POSITION Y CONTROL (m)
+% 8.1 - VELOCITY X REF (m)
+% 8.2 - VELOCITY Y REF (m)
+% 8.3 - VELOCITY X CONTROL (m)
+% 8.4 - VELOCITY Y CONTROL (m)
+% 9.1 - LEFT MOTOR RATE (rad/s)
+% 9.2 - RIGHT MOTOR RATE (rad/s)
+% 10.1 - MOTOR COM RATE (rad/s)
+% 10.2 - MOTOR DIF RATE (rad/s)
+% 11.1 - PITCH RATE (rad/s)
+% 12.1 - PITCH ANGLE REF (deg)
+% 12.2 - PITCH ANGLE CONTROL (deg)
 
 FIG_YLABEL = { ...
 {'','FORWARD VELOCITY (m/s)'}
 {'','YAW RATE (rad/s)'}
 {'','YAW ANGLE (deg)'}
 {'','WALL DIST (m)'}
-{'LEFT MOTOR VOLT (V)','RIGHT MOTOR VOLT (V)'}
-{'COM MOTOR VOLT (V)','DIF MOTOR VOLT (V)'}
+{'LEFT MOTOR VOLT (V)','RIGHT MOTOR VOLT (V)','BATTERY (V)','',''}
+{'COM MOTOR VOLT (V)','DIF MOTOR VOLT (V)','',''}
+{'','','POSITION X (m)','POSITION Y (m)'}
+{'','','VELOCITY X (m)','VELOCITY Y (m)'}
+{'LEFT MOTOR RATE (rad/s)','RIGHT MOTOR RATE (rad/s)'}
+{'COM MOTOR RATE (rad/s)','DIF MOTOR RATE (rad/s)'}
+{'PITCH RATE (rad/s)'}
+{'','PITCH ANGLE (rad)'}
 };
 
 %--------------------------------------------------------------
